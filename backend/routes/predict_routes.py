@@ -28,21 +28,19 @@ def call_huggingface(image_path):
     ext = image_path.rsplit(".", 1)[-1].lower()
     mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
 
+    # ✅ Send as plain string, not dict
     payload = {
         "data": [
-            {"path": f"data:{mime};base64,{image_b64}"},
+            f"data:{mime};base64,{image_b64}",
             "EfficientNet"
         ]
     }
 
-    print(f"Calling HF: {HF_API_URL}/gradio_api/call/predict")
     response = requests.post(
         f"{HF_API_URL}/gradio_api/call/predict",
         json=payload,
         timeout=60
     )
-    print(f"HF status: {response.status_code}")
-    print(f"HF response: {response.text[:500]}")
     response.raise_for_status()
 
     event_id = response.json().get("event_id")
@@ -50,12 +48,10 @@ def call_huggingface(image_path):
         f"{HF_API_URL}/gradio_api/call/predict/{event_id}",
         timeout=60
     )
-    print(f"HF result response: {result_response.text[:500]}")  # ← add this
     for line in result_response.text.split("\n"):
         if line.startswith("data: "):
             import json
             data = json.loads(line[6:])
-            print(f"HF parsed data: {data}")  # ← add this
             return data[0] if data else {}
     return {}
 
