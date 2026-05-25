@@ -34,23 +34,21 @@ def call_huggingface(image_path):
         ]
     }
 
-    print(f"Calling HF: {HF_API_URL}/call/predict")
+    print(f"Calling HF: {HF_API_URL}/gradio_api/call/predict")
     response = requests.post(
-        f"{HF_API_URL}/call/predict",
+        f"{HF_API_URL}/gradio_api/call/predict",
         json=payload,
         timeout=60
     )
     print(f"HF status: {response.status_code}")
     print(f"HF response: {response.text[:500]}")
     response.raise_for_status()
-    
-    # Gradio returns an event_id, then we fetch the result
+
     event_id = response.json().get("event_id")
     result_response = requests.get(
-        f"{HF_API_URL}/call/predict/{event_id}",
+        f"{HF_API_URL}/gradio_api/call/predict/{event_id}",
         timeout=60
     )
-    # Parse SSE response
     for line in result_response.text.split("\n"):
         if line.startswith("data: "):
             import json
