@@ -59,6 +59,7 @@ def call_huggingface(image_path):
         if line.startswith("data: "):
             import json
             data = json.loads(line[6:])
+            print("HF RESULT DATA:", data)  # ← add this
             return data[0] if data else {}
     return {}
 
