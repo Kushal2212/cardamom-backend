@@ -887,7 +887,7 @@
     /* ═══════════════════════════════════════
        CONFIG — point these to your API
     ═══════════════════════════════════════ */
-    const API_BASE = (typeof window.API_BASE !== 'undefined') ? window.API_BASE : 'http://127.0.0.1:5000';
+    const API_BASE = (typeof window.API_BASE !== 'undefined') ? window.API_BASE : 'https://cardamom-backend-00ks.onrender.com/';
     function getToken() { return localStorage.getItem('cardamom_token') || localStorage.getItem('token') || ''; }
     function getUsername() { return localStorage.getItem('cardamom_user') || 'User'; }
 
