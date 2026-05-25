@@ -7,6 +7,5 @@ database/*.db
 .env
 
 .vscode/
-database/
 dataset/
 models/
