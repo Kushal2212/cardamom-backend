@@ -1,11 +1,12 @@
 import os
 import uuid
-from pymongo import response
+
 import requests
 import base64
 from datetime import datetime
 
-from flask import Blueprint, json, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app
+import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 
