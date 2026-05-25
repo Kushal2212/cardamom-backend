@@ -66,14 +66,14 @@ def create_app():
 
     # ── Optional contact routes ──────────────────────────────────────────
     try:
-        from backend.routes.contact_routes import contact_bp
+        from routes.contact_routes import contact_bp
         app.register_blueprint(contact_bp)
     except ImportError:
         print("⚠️ Contact routes not loaded")
 
     # ── SMS system ───────────────────────────────────────────────────────
     try:
-        from backend.routes.sms_alert_system import sms_bp, start_scheduler
+        from routes.sms_alert_system import sms_bp, start_scheduler
         app.register_blueprint(sms_bp)
         start_scheduler(app)
         print("✅ SMS system loaded")
