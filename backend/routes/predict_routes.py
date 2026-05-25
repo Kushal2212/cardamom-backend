@@ -1,12 +1,11 @@
 import os
 import uuid
-
 import requests
 import base64
 from datetime import datetime
+import json
 
 from flask import Blueprint, request, jsonify, current_app
-import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 
@@ -15,8 +14,28 @@ from database.mongo import predictions
 predict_bp = Blueprint("predict", __name__, url_prefix="/api")
 
 ALLOWED_EXT = {"jpg", "jpeg", "png", "bmp", "webp"}
-HF_API_URL = os.environ.get(
-    "HF_API_URL", "https://kushal2212-cardamom-model.hf.space")
+HF_API_URL = os.environ.get("HF_API_URL", "https://kushal2212-cardamom-model.hf.space")
+
+DISEASE_INFO = {
+    "healthy": {
+        "nepali": "स्वस्थ",
+        "description": "बोट स्वस्थ अवस्थामा छ।",
+        "recommendation": "नियमित हेरचाह जारी राख्नुहोस्।",
+        "severity": "कुनै जोखिम छैन"
+    },
+    "chhirke": {
+        "nepali": "छिर्के रोग",
+        "description": "छिर्के भाइरसजन्य रोग हो।",
+        "recommendation": "संक्रमित बोट तुरुन्त उखेलेर नष्ट गर्नुहोस्।",
+        "severity": "उच्च जोखिम"
+    },
+    "leaf_blight": {
+        "nepali": "पात झुल्सा रोग",
+        "description": "पात झुल्सा ढुसीजन्य रोग हो।",
+        "recommendation": "म्यान्कोजेब छर्नुहोस्। संक्रमित पात काटेर नष्ट गर्नुहोस्।",
+        "severity": "मध्यम जोखिम"
+    }
+}
 
 
 def allowed(filename):
@@ -32,9 +51,9 @@ def call_huggingface(image_path):
             timeout=60
         )
     upload_response.raise_for_status()
-    uploaded_path = upload_response.json()[0]  # returns a path string
+    uploaded_path = upload_response.json()[0]
 
-    # Step 2: Call predict with uploaded path
+    # Step 2: Call predict
     payload = {
         "data": [
             {"path": uploaded_path},
@@ -47,7 +66,6 @@ def call_huggingface(image_path):
         timeout=60
     )
     response.raise_for_status()
-
     event_id = response.json()["event_id"]
 
     # Step 3: Get result
@@ -57,9 +75,7 @@ def call_huggingface(image_path):
     )
     for line in result_response.text.split("\n"):
         if line.startswith("data: "):
-            import json
             data = json.loads(line[6:])
-            print("HF RESULT DATA:", data)  # ← add this
             return data[0] if data else {}
     return {}
 
@@ -84,7 +100,7 @@ def predict():
     file.save(filepath)
 
     try:
-        result = call_huggingface(filepath)
+        hf_result = call_huggingface(filepath)
     except requests.exceptions.Timeout:
         return jsonify({"error": "Model server timed out. Try again."}), 504
     except Exception as e:
@@ -92,39 +108,41 @@ def predict():
         print("PREDICT ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
-    if "error" in result:
-        return jsonify(result), 200
+    # Map HF response → internal format
+    disease = hf_result.get("predicted_class") or hf_result.get("disease")
+    confidence = hf_result.get("confidence", 0)
 
-    if "disease" not in result:
-        return jsonify({"error": "Invalid model output"}), 500
+    if not disease:
+        return jsonify({"error": "Invalid model output", "raw": hf_result}), 500
+
+    info = DISEASE_INFO.get(disease, {
+        "nepali": disease,
+        "description": "No information available.",
+        "recommendation": "Consult an agricultural expert.",
+        "severity": "Unknown"
+    })
 
     doc = {
-        "user_id":          user_id,
-        "disease":          result["disease"],
-        "confidence":       result["confidence"],
-        "severity":         result.get("severity"),
-        "nepali_name":      result.get("nepali"),
-        "recommendation":   result.get("recommendation"),
-        "image_filename":   filename,
-        "all_predictions":  result.get("all_predictions", []),
-        "model_details":    result.get("model_details", {}),
-        "created_at":       datetime.utcnow()
+        "user_id":        user_id,
+        "disease":        disease,
+        "confidence":     confidence,
+        "severity":       info["severity"],
+        "nepali_name":    info["nepali"],
+        "recommendation": info["recommendation"],
+        "image_filename": filename,
+        "created_at":     datetime.utcnow()
     }
     inserted = predictions.insert_one(doc)
 
     return jsonify({
-        "prediction_id":    str(inserted.inserted_id),
-        "disease":          result["disease"],
-        "confidence":       result["confidence"],
-        "confidence_level": result.get("confidence_level"),
-        "confidence_label": result.get("confidence_label"),
-        "low_confidence":   result.get("low_confidence", False),
-        "severity":         result.get("severity"),
-        "nepali":           result.get("nepali"),
-        "description":      result.get("description"),
-        "recommendation":   result.get("recommendation"),
-        "image_url":        f"/static/uploads/{filename}",
-        "gradcam_url":      None,
-        "all_predictions":  result.get("all_predictions", []),
-        "saved":            True
-    })
+        "prediction_id":  str(inserted.inserted_id),
+        "disease":        disease,
+        "confidence":     confidence,
+        "severity":       info["severity"],
+        "nepali":         info["nepali"],
+        "description":    info["description"],
+        "recommendation": info["recommendation"],
+        "image_url":      f"/static/uploads/{filename}",
+        "gradcam_url":    None,
+        "saved":          True
+    }), 200
