@@ -86,6 +86,8 @@ def predict():
     except requests.exceptions.Timeout:
         return jsonify({"error": "Model server timed out. Try again."}), 504
     except Exception as e:
+        import traceback
+        print("PREDICT ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
     if "error" in result:
