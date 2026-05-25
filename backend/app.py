@@ -1,6 +1,6 @@
 # top of app.py
 from database.mongo import users
-from backend.extensions import bcrypt, jwt
+from extensions import bcrypt, jwt
 from flask_cors import CORS
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from datetime import timedelta
@@ -52,11 +52,11 @@ def create_app():
     jwt.init_app(app)
 
     # ── Core blueprints ──────────────────────────────────────────────────
-    from backend.routes.auth import auth_bp
-    from backend.routes.predict_routes import predict_bp
-    from backend.routes.admin import admin_bp
-    from backend.routes.weather import weather_bp
-    from backend.routes.newsletter_routes import newsletter_bp
+    from routes.auth import auth_bp
+    from routes.predict_routes import predict_bp
+    from routes.admin import admin_bp
+    from routes.weather import weather_bp
+    from routes.newsletter_routes import newsletter_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(predict_bp)
