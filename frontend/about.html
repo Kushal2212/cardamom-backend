@@ -10,14 +10,18 @@
     />
     <style>
       :root {
-        --g1: #1a3a2a;
-        --g2: #2d5c3f;
-        --g3: #4a9463;
-        --gp: #a8d5b0;
-        --cream: #f5f0e8;
-        --gold: #c8a84b;
-        --white: #fff;
-      }
+  --g1: #0e1f16;
+  --g2: #162d1e;
+  --g3: #1f4029;
+  --g4: #2d6642;
+  --g5: #3d8c5a;
+  --gp: #7ec89a;
+  --gpl: #b8dfc6;
+  --cream: #f2ece0;
+  --gold: #c9a84c;
+  --gold2: #e8c96a;
+  --white: #fff;
+}
       *,
       *::before,
       *::after {
@@ -85,10 +89,13 @@
         color: var(--white);
       }
       .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 28px;
-      }
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
       .nav-links a {
         color: var(--gp);
         text-decoration: none;
@@ -581,55 +588,96 @@
         border-radius: 6px;
         cursor: pointer;
       }
+
+      .nav-avatar-btn {
+  display:flex;align-items:center;gap:8px;
+  padding:5px 12px 5px 6px;
+  background:rgba(61,140,90,0.1);
+  border:1px solid rgba(126,200,154,0.2);
+  border-radius:99px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  transition:all 0.25s;
+}
+.nav-avatar-btn:hover {
+  background:rgba(61,140,90,0.2);
+  border-color:rgba(126,200,154,0.38);
+}
+.nav-avatar-circle {
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#3d8c5a,#2d6642);
+  border:1px solid rgba(126,200,154,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;color:white;font-weight:700;
+}
+.nav-avatar-name {
+  font-size:0.8rem;color:#7ec89a;font-weight:500;
+}
+.nav-avatar-chevron {
+  width:12px;height:12px;
+  stroke:rgba(126,200,154,0.5);fill:none;stroke-width:2;stroke-linecap:round;
+}
+.logout-btn {
+  padding:7px 14px;
+  background:rgba(192,57,43,0.1);
+  border:1px solid rgba(192,57,43,0.22);
+  border-radius:7px;color:#f1948a;
+  font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;
+  transition:all 0.2s;
+}
+.logout-btn:hover { background:rgba(192,57,43,0.18); }
+
+
     </style>
   </head>
   <body>
     
-    <script>
-      const TOKEN_KEY = "cardamom_token";
-      const USER_KEY = "cardamom_user";
+    <script src="static/config.js"></script>
+<script>
+  const TOKEN_KEY = 'cardamom_token';
+  const USER_KEY  = 'cardamom_user';
 
-      const token = localStorage.getItem(TOKEN_KEY);
-      const user = localStorage.getItem(USER_KEY);
+  function renderNavbarAuth() {
+    const navAuth = document.getElementById('cdx-nav-auth');
+    const mobAuth = document.getElementById('cdx-mob-auth');
+    const token = localStorage.getItem(TOKEN_KEY);
+    const user  = localStorage.getItem(USER_KEY) || 'User';
 
-      // 🔒 Protect page
-      if (!token) {
-        localStorage.setItem("redirectAfterLogin", window.location.pathname);
-        window.location.href = "login.html";
-      }
+    if (!token) {
+      if (navAuth) navAuth.innerHTML = `
+        <a href="login.html" class="login-btn">Login</a>
+        <a href="register.html" class="register-btn">Register</a>`;
+      if (mobAuth) mobAuth.innerHTML = `
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>`;
+    } else {
+      const initials = user.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '👤';
+      if (navAuth) navAuth.innerHTML = `
+  <button class="nav-avatar-btn" onclick="window.location.href='app.html'" title="Profile">
+    <div class="nav-avatar-circle" id="navAvatarCircle">${initials}</div>
+    <span class="nav-avatar-name">${user}</span>
+    <svg class="nav-avatar-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+  </button>
+  <a href="app.html" style="padding:7px 14px;background:rgba(61,140,90,0.12);border:1px solid rgba(126,200,154,0.2);border-radius:7px;color:#7ec89a;font-size:0.78rem;text-decoration:none;">Dashboard →</a>
+  <button onclick="logout()" class="logout-btn">Logout</button>`;
+if (mobAuth) mobAuth.innerHTML = `
+  <a href="app.html" style="cursor:pointer;">👤 ${user}</a>
+  <a href="app.html">Dashboard</a>
+  <a onclick="logout()" style="color:#f1948a;cursor:pointer;">Logout</a>`;
+    }
+  }
 
-      // Navbar + greeting
-      document.addEventListener("DOMContentLoaded", () => {
-        const navAuth = document.getElementById("cdx-nav-auth");
-        if (navAuth && user) {
-          navAuth.innerHTML = `
-      <span class="user-name">👤 ${user}</span>
-      <button id="logout-btn" class="logout-btn">Logout</button>
-    `;
+  function logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    window.location.href = 'login.html';
+  }
 
-          document
-            .getElementById("logout-btn")
-            .addEventListener("click", () => {
-              localStorage.removeItem(TOKEN_KEY);
-              localStorage.removeItem(USER_KEY);
-              window.location.href = "login.html";
-            });
+  function toggleMenu() {
+    document.getElementById('mob').classList.toggle('open');
+  }
 
-          document
-            .getElementById("logout-btn")
-            .addEventListener("click", () => {
-              localStorage.removeItem(TOKEN_KEY);
-              localStorage.removeItem(USER_KEY);
-              window.location.href = "/login";
-            });
-        }
-
-        const userGreeting = document.getElementById("user-greeting");
-        if (userGreeting && user) {
-          userGreeting.innerHTML = `Hello, <strong>${user}</strong>`;
-        }
-      });
-    </script>
+  document.addEventListener('DOMContentLoaded', renderNavbarAuth);
+</script>
     <nav id="navbar">
       <a href="index.html" class="nav-brand"><span>🌿</span><strong>अलैँची</strong></a>
       <div class="nav-links">
@@ -700,10 +748,7 @@
         <span></span><span></span><span></span>
       </div>
 
-      <div
-        id="cdx-nav-auth"
-        style="display: flex; align-items: center; gap: 8px"
-      ></div>
+      <div id="cdx-nav-auth" style="display:flex;align-items:center;gap:8px;"></div>
     </nav>
     <div class="mob-menu" id="mob">
       <a href="index.html">🏠 Home</a>
@@ -970,7 +1015,6 @@
     <footer>
       <p>© 2026 अलैँची · Nepal 🇳🇵 · एलाइची रोग पहिचान प्रणाली</p>
     </footer>
-<script src="static/config.js"></script>
     <script>
       const obs = new IntersectionObserver(
         (entries) => {
