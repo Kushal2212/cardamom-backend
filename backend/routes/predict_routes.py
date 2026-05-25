@@ -24,14 +24,20 @@ def allowed(filename):
 
 def call_huggingface(image_path):
     with open(image_path, "rb") as f:
-        image_b64 = base64.b64encode(f.read()).decode("utf-8")
+        image_b64 = base64.b64encode(f.read()).decode()
+
     ext = image_path.rsplit(".", 1)[-1].lower()
     mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
 
-    # ✅ Send as plain string, not dict
     payload = {
         "data": [
-            f"data:{mime};base64,{image_b64}",
+            {
+                "path": image_path,
+                "meta": {"_type": "gradio.FileData"},
+                "orig_name": image_path.split("/")[-1],
+                "mime_type": mime,
+                "data": f"data:{mime};base64,{image_b64}"
+            },
             "EfficientNet"
         ]
     }
@@ -41,18 +47,21 @@ def call_huggingface(image_path):
         json=payload,
         timeout=60
     )
+
     response.raise_for_status()
 
-    event_id = response.json().get("event_id")
-    result_response = requests.get(
+    event_id = response.json()["event_id"]
+
+    result = requests.get(
         f"{HF_API_URL}/gradio_api/call/predict/{event_id}",
         timeout=60
     )
-    for line in result_response.text.split("\n"):
+
+    for line in result.text.split("\n"):
         if line.startswith("data: "):
-            import json
             data = json.loads(line[6:])
-            return data[0] if data else {}
+            return data[0]
+
     return {}
 
 
