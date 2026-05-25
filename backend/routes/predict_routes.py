@@ -1,5 +1,6 @@
 import os
 import uuid
+from pymongo import response
 import requests
 import base64
 from datetime import datetime
@@ -49,10 +50,12 @@ def call_huggingface(image_path):
         f"{HF_API_URL}/gradio_api/call/predict/{event_id}",
         timeout=60
     )
+    print(f"HF result response: {result_response.text[:500]}")  # ← add this
     for line in result_response.text.split("\n"):
         if line.startswith("data: "):
             import json
             data = json.loads(line[6:])
+            print(f"HF parsed data: {data}")  # ← add this
             return data[0] if data else {}
     return {}
 
