@@ -23,46 +23,42 @@ def allowed(filename):
 
 
 def call_huggingface(image_path):
+    # Step 1: Upload image to HF Space
     with open(image_path, "rb") as f:
-        image_bytes = f.read()
+        upload_response = requests.post(
+            f"{HF_API_URL}/gradio_api/upload",
+            files={"files": f},
+            timeout=60
+        )
+    upload_response.raise_for_status()
+    uploaded_path = upload_response.json()[0]  # returns a path string
 
-    image_b64 = base64.b64encode(image_bytes).decode()
-
-    ext = os.path.splitext(image_path)[1].lower()
-    mime = "image/jpeg" if ext in [".jpg", ".jpeg"] else f"image/{ext[1:]}"
-
+    # Step 2: Call predict with uploaded path
     payload = {
         "data": [
-            {
-                "orig_name": os.path.basename(image_path),
-                "mime_type": mime,
-                "data": f"data:{mime};base64,{image_b64}",
-                "meta": {"_type": "gradio.FileData"}
-            },
+            {"path": uploaded_path},
             "EfficientNet"
         ]
     }
-
     response = requests.post(
         f"{HF_API_URL}/gradio_api/call/predict",
         json=payload,
         timeout=60
     )
-
     response.raise_for_status()
 
     event_id = response.json()["event_id"]
 
-    result = requests.get(
+    # Step 3: Get result
+    result_response = requests.get(
         f"{HF_API_URL}/gradio_api/call/predict/{event_id}",
         timeout=60
     )
-
-    for line in result.text.split("\n"):
+    for line in result_response.text.split("\n"):
         if line.startswith("data: "):
+            import json
             data = json.loads(line[6:])
-            return data[0]
-
+            return data[0] if data else {}
     return {}
 
 
