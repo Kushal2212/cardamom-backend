@@ -26,23 +26,37 @@ def call_huggingface(image_path):
         image_b64 = base64.b64encode(f.read()).decode("utf-8")
     ext = image_path.rsplit(".", 1)[-1].lower()
     mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
-    
+
     payload = {
         "data": [
-            {"name": "image", "data": f"data:{mime};base64,{image_b64}"}
+            {"path": f"data:{mime};base64,{image_b64}"},
+            "EfficientNet"
         ]
     }
-    
-    print(f"Calling HF: {HF_API_URL}/run/predict")  # ← add this
+
+    print(f"Calling HF: {HF_API_URL}/call/predict")
     response = requests.post(
-        f"{HF_API_URL}/run/predict",
+        f"{HF_API_URL}/call/predict",
         json=payload,
         timeout=60
     )
-    print(f"HF response status: {response.status_code}")  # ← add this
-    print(f"HF response: {response.text[:500]}")  # ← add this
+    print(f"HF status: {response.status_code}")
+    print(f"HF response: {response.text[:500]}")
     response.raise_for_status()
-    return response.json().get("data", [{}])[0]
+    
+    # Gradio returns an event_id, then we fetch the result
+    event_id = response.json().get("event_id")
+    result_response = requests.get(
+        f"{HF_API_URL}/call/predict/{event_id}",
+        timeout=60
+    )
+    # Parse SSE response
+    for line in result_response.text.split("\n"):
+        if line.startswith("data: "):
+            import json
+            data = json.loads(line[6:])
+            return data[0] if data else {}
+    return {}
 
 
 @predict_bp.route("/predict", methods=["POST"])
