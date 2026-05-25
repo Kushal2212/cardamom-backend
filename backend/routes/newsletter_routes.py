@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 import os
 
-from backend.database.mongo import users, newsletter
+from database.mongo import users, newsletter
 
 newsletter_bp = Blueprint("newsletter", __name__, url_prefix="/api/newsletter")
 

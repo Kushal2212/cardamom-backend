@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson import ObjectId
-from backend.database.mongo import users, mongo_db, farmers as farmers_col
+from database.mongo import users, mongo_db, farmers as farmers_col
 
 log = logging.getLogger(__name__)
 
