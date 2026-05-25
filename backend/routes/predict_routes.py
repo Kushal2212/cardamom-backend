@@ -33,11 +33,14 @@ def call_huggingface(image_path):
         ]
     }
     
+    print(f"Calling HF: {HF_API_URL}/run/predict")  # ← add this
     response = requests.post(
-        f"{HF_API_URL}/run/predict",  # ← change /api/predict to /run/predict
+        f"{HF_API_URL}/run/predict",
         json=payload,
         timeout=60
     )
+    print(f"HF response status: {response.status_code}")  # ← add this
+    print(f"HF response: {response.text[:500]}")  # ← add this
     response.raise_for_status()
     return response.json().get("data", [{}])[0]
 
