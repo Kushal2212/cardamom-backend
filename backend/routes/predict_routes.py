@@ -5,7 +5,7 @@ import requests
 import base64
 from datetime import datetime
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, json, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 
@@ -24,19 +24,20 @@ def allowed(filename):
 
 def call_huggingface(image_path):
     with open(image_path, "rb") as f:
-        image_b64 = base64.b64encode(f.read()).decode()
+        image_bytes = f.read()
 
-    ext = image_path.rsplit(".", 1)[-1].lower()
-    mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
+    image_b64 = base64.b64encode(image_bytes).decode()
+
+    ext = os.path.splitext(image_path)[1].lower()
+    mime = "image/jpeg" if ext in [".jpg", ".jpeg"] else f"image/{ext[1:]}"
 
     payload = {
         "data": [
             {
-                "path": image_path,
-                "meta": {"_type": "gradio.FileData"},
-                "orig_name": image_path.split("/")[-1],
+                "orig_name": os.path.basename(image_path),
                 "mime_type": mime,
-                "data": f"data:{mime};base64,{image_b64}"
+                "data": f"data:{mime};base64,{image_b64}",
+                "meta": {"_type": "gradio.FileData"}
             },
             "EfficientNet"
         ]
