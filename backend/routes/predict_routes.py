@@ -61,17 +61,7 @@ def call_huggingface(image_path):
             data = json.loads(line[6:])
             return data[0] if data else {}
     return {}
-@predict_bp.route("/predict", methods=["POST"])
-@jwt_required()
-def predict():
-    try:
-        print("=== PREDICT ROUTE HIT ===")
-        user_id = get_jwt_identity()
-        print("USER:", user_id)
-    except Exception as e:
-        import traceback
-        print("EARLY ERROR:", traceback.format_exc())
-        return jsonify({"error": str(e)}), 500
+
 
 @predict_bp.route("/predict", methods=["POST"])
 @jwt_required()
