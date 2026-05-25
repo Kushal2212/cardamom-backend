@@ -26,10 +26,18 @@ def call_huggingface(image_path):
         image_b64 = base64.b64encode(f.read()).decode("utf-8")
     ext = image_path.rsplit(".", 1)[-1].lower()
     mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
+    
     payload = {
-        "data": [{"name": "image", "data": f"data:{mime};base64,{image_b64}"}]}
+        "data": [
+            {"name": "image", "data": f"data:{mime};base64,{image_b64}"}
+        ]
+    }
+    
     response = requests.post(
-        f"{HF_API_URL}/api/predict", json=payload, timeout=60)
+        f"{HF_API_URL}/run/predict",  # ← change /api/predict to /run/predict
+        json=payload,
+        timeout=60
+    )
     response.raise_for_status()
     return response.json().get("data", [{}])[0]
 
