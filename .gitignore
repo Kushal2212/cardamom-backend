@@ -1,0 +1,12 @@
+convert.py
+raw_images
+.venv/
+__pycache__/
+*.pyc
+database/*.db
+.env
+
+.vscode/
+database/
+dataset/
+models/

@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login – अलैँची</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --g1: #1a3a2a;
+        --g2: #2d5c3f;
+        --g3: #4a9463;
+        --gp: #a8d5b0;
+        --cream: #f5f0e8;
+        --gold: #c8a84b;
+        --white: #fff;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--g1);
+        color: var(--cream);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 20% 10%,
+            rgba(74, 148, 99, 0.18) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 80% at 80% 90%,
+            rgba(45, 92, 63, 0.28) 0%,
+            transparent 60%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+      .orb {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(70px);
+        pointer-events: none;
+        animation: drift 10s ease-in-out infinite;
+      }
+      .orb1 {
+        width: 350px;
+        height: 350px;
+        background: rgba(74, 148, 99, 0.1);
+        top: 10%;
+        left: -10%;
+        animation-delay: 0s;
+      }
+      .orb2 {
+        width: 250px;
+        height: 250px;
+        background: rgba(200, 168, 75, 0.07);
+        bottom: 10%;
+        right: -8%;
+        animation-delay: -5s;
+      }
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(15px, -15px);
+        }
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20%,
+        60% {
+          transform: translateX(-6px);
+        }
+        40%,
+        80% {
+          transform: translateX(6px);
+        }
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .auth-card {
+        width: 100%;
+        max-width: 440px;
+        animation: fadeUp 0.6s ease both;
+      }
+
+      .brand {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .brand a {
+        text-decoration: none;
+      }
+      .brand .leaf {
+        font-size: 2.8rem;
+        display: block;
+        margin-bottom: 8px;
+      }
+      .brand h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.6rem;
+        color: var(--white);
+      }
+      .brand h1 span {
+        color: var(--gp);
+      }
+      .brand p {
+        color: rgba(168, 213, 176, 0.6);
+        font-size: 0.8rem;
+        margin-top: 4px;
+      }
+
+      .box {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(168, 213, 176, 0.18);
+        border-radius: 20px;
+        padding: 32px 28px;
+        backdrop-filter: blur(14px);
+      }
+
+      .redirect-notice {
+        background: rgba(200, 168, 75, 0.1);
+        border: 1px solid rgba(200, 168, 75, 0.3);
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 18px;
+        font-size: 0.83rem;
+        color: var(--gold);
+        display: none;
+        align-items: center;
+        gap: 8px;
+      }
+      .redirect-notice.show {
+        display: flex;
+      }
+
+      .field {
+        margin-bottom: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 0.74rem;
+        color: var(--gp);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 6px;
+      }
+      .field label span.req {
+        color: #f1948a;
+      }
+      .field input {
+        width: 100%;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(168, 213, 176, 0.2);
+        border-radius: 10px;
+        color: var(--cream);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.92rem;
+        outline: none;
+        transition:
+          border 0.2s,
+          background 0.2s;
+      }
+      .field input:focus {
+        border-color: rgba(168, 213, 176, 0.55);
+        background: rgba(255, 255, 255, 0.11);
+      }
+      .field .pw-wrap {
+        position: relative;
+      }
+      .field .pw-wrap input {
+        padding-right: 46px;
+      }
+      .field .eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--gp);
+        cursor: pointer;
+        font-size: 1.05rem;
+        padding: 0;
+      }
+      .field-err {
+        display: none;
+        font-size: 0.75rem;
+        color: #f1948a;
+        margin-top: 5px;
+        padding: 4px 10px;
+        background: rgba(192, 57, 43, 0.12);
+        border-left: 2px solid #f1948a;
+        border-radius: 0 4px 4px 0;
+      }
+      .field-err.show {
+        display: block;
+      }
+
+      .alert {
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.83rem;
+        margin-bottom: 14px;
+        display: none;
+      }
+      .alert.show {
+        display: block;
+      }
+      .alert-err {
+        background: rgba(192, 57, 43, 0.2);
+        border: 1px solid rgba(192, 57, 43, 0.4);
+        color: #f1948a;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--g3), var(--g2));
+        color: var(--white);
+        border: none;
+        border-radius: 12px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.97rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(74, 148, 99, 0.45);
+      }
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .switch-txt {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 0.83rem;
+        color: var(--gp);
+      }
+      .switch-txt a {
+        color: var(--gold);
+        text-decoration: underline;
+      }
+
+      .back {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .back a {
+        color: rgba(168, 213, 176, 0.5);
+        text-decoration: none;
+        font-size: 0.82rem;
+        transition: color 0.2s;
+      }
+      .back a:hover {
+        color: var(--gp);
+      }
+
+      footer {
+        text-align: center;
+        padding: 16px;
+        color: rgba(168, 213, 176, 0.3);
+        font-size: 0.74rem;
+        position: relative;
+        z-index: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+
+    <main>
+      <div class="auth-card">
+        <div class="brand">
+          <a href="index.html"><span class="leaf">🌿</span></a>
+          <h1>Cardamom<span>Dx</span></h1>
+          <p>एलाइची रोग पहिचान प्रणाली</p>
+        </div>
+
+        <div class="box">
+          <div class="redirect-notice" id="redirect-notice">
+            <span>🔒</span>
+            <span
+              >Login to access
+              <strong id="redirect-page-name">that page</strong></span
+            >
+          </div>
+
+          <div class="alert alert-err" id="login-apierr"></div>
+
+          <div class="field">
+            <label for="l-email">Email <span class="req">*</span></label>
+            <input
+              type="email"
+              id="l-email"
+              placeholder="your@email.com"
+              oninput="clearErr('l-email', 'l-email-err')"
+            />
+            <div class="field-err" id="l-email-err"></div>
+          </div>
+
+          <div class="field">
+            <label for="l-pass">Password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input
+                type="password"
+                id="l-pass"
+                placeholder="••••••"
+                oninput="clearErr('l-pass', 'l-pass-err')"
+              />
+              <button
+                class="eye"
+                id="l-eye"
+                onclick="toggleEye('l-pass', 'l-eye')"
+              >
+                👁
+              </button>
+            </div>
+            <div class="field-err" id="l-pass-err"></div>
+          </div>
+
+          <button class="btn" id="l-btn" onclick="doLogin()">Login</button>
+
+          <p class="switch-txt">
+            No account? <a href="register.html">Register here</a>
+          </p>
+        </div>
+
+        <div class="back"><a href="index.html">← Back to Home</a></div>
+      </div>
+    </main>
+
+    <footer>© 2025 अलैँची · Nepal 🇳🇵</footer>
+
+    <script src="static/config.js"></script>
+    <script>
+      const TOKEN_KEY = "cardamom_token";
+      const USER_KEY = "cardamom_user";
+
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get("redirect") || "/";
+
+      if (localStorage.getItem(TOKEN_KEY)) {
+        if (params.get("redirect")) {
+          window.location.href = redirectTo;
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        if (params.get("redirect")) {
+          const names = {
+            about: "About page",
+            blog: "Blog",
+            contact: "Contact page",
+            app: "Disease Detection App",
+          };
+          document.getElementById("redirect-page-name").textContent =
+            names[redirectTo] || redirectTo;
+          document.getElementById("redirect-notice").classList.add("show");
+        }
+      });
+
+      function setErr(inputId, errId, msg) {
+        const inp = document.getElementById(inputId);
+        const err = document.getElementById(errId);
+        if (msg) {
+          inp.style.border = "1px solid rgba(241,148,138,.75)";
+          inp.style.background = "rgba(192,57,43,.08)";
+          err.textContent = msg;
+          err.classList.add("show");
+          inp.style.animation = "none";
+          setTimeout(() => (inp.style.animation = "shake .35s ease"), 10);
+        } else {
+          inp.style.border = "1px solid rgba(168,213,176,.2)";
+          inp.style.background = "rgba(255,255,255,.08)";
+          err.textContent = "";
+          err.classList.remove("show");
+          inp.style.animation = "none";
+        }
+      }
+
+      function clearErr(inputId, errId) {
+        setErr(inputId, errId, "");
+      }
+
+      function toggleEye(inputId, btnId) {
+        const inp = document.getElementById(inputId);
+        const btn = document.getElementById(btnId);
+        const show = inp.type === "password";
+        inp.type = show ? "text" : "password";
+        btn.textContent = show ? "🙈" : "👁";
+      }
+
+      function spinner(text) {
+        return `<span style="display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></span>&nbsp;${text}`;
+      }
+
+      async function doLogin() {
+        const email = document.getElementById("l-email").value.trim();
+        const pass = document.getElementById("l-pass").value;
+        const apiErr = document.getElementById("login-apierr");
+        apiErr.classList.remove("show");
+        let valid = true;
+
+        if (!email) {
+          setErr(
+            "l-email",
+            "l-email-err",
+            "⚠ Email is required — please enter your email",
+          );
+          valid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          setErr(
+            "l-email",
+            "l-email-err",
+            "⚠ Invalid email — use format: name@example.com",
+          );
+          valid = false;
+        }
+
+        if (!pass) {
+          setErr(
+            "l-pass",
+            "l-pass-err",
+            "⚠ Password is required — please enter your password",
+          );
+          valid = false;
+        }
+
+        if (!valid) return;
+
+        const btn = document.getElementById("l-btn");
+        btn.disabled = true;
+        btn.innerHTML = spinner("Logging in…");
+
+        try {
+          const res = await fetch(`${API_BASE}api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password: pass }),
+          });
+          const d = await res.json();
+
+          if (d.error) {
+            const m = d.error.toLowerCase();
+            if (
+              m.includes("email") ||
+              m.includes("user") ||
+              m.includes("not found")
+            )
+              setErr("l-email", "l-email-err", "⚠ " + d.error);
+            else if (
+              m.includes("password") ||
+              m.includes("incorrect") ||
+              m.includes("wrong")
+            )
+              setErr("l-pass", "l-pass-err", "⚠ " + d.error);
+            else {
+              apiErr.textContent = "❌ " + d.error;
+              apiErr.classList.add("show");
+            }
+          } else {
+            localStorage.setItem(TOKEN_KEY, d.token);
+            localStorage.setItem(USER_KEY, d.user?.name || email.split("@")[0]);
+            const redirectPage = localStorage.getItem("redirectAfterLogin");
+
+            if (redirectPage) {
+              localStorage.removeItem("redirectAfterLogin");
+              window.location.href = redirectPage;
+            } else {
+              window.location.href = "/";
+            }
+          }
+        } catch {
+          apiErr.textContent =
+            "Network error — check your connection and try again";
+          apiErr.classList.add("show");
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = "Login";
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        const id = document.activeElement?.id;
+        if (["l-email", "l-pass"].includes(id)) doLogin();
+      });
+    </script>
+  </body>
+</html>

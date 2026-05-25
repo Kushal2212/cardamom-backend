@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Contact – अलैँची</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --g1: #1a3a2a;
+        --g2: #2d5c3f;
+        --g3: #4a9463;
+        --gp: #a8d5b0;
+        --cream: #f5f0e8;
+        --gold: #c8a84b;
+        --white: #fff;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--g1);
+        color: var(--cream);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 20% 10%,
+            rgba(74, 148, 99, 0.18) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 80% at 80% 90%,
+            rgba(45, 92, 63, 0.28) 0%,
+            transparent 60%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ─── Nav ─── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 0 5%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 68px;
+        background: rgba(26, 58, 42, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(168, 213, 176, 0.1);
+      }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .nav-brand span {
+        font-size: 24px;
+      }
+      .nav-brand strong {
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+        color: var(--white);
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .nav-links a {
+        color: var(--gp);
+        text-decoration: none;
+        font-size: 0.88rem;
+        transition: color 0.2s;
+        position: relative;
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--gold);
+        transition: width 0.25s;
+      }
+      .nav-links a:hover {
+        color: var(--white);
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+      .nav-links a.active {
+        color: var(--white);
+      }
+      .nav-links a.active::after {
+        width: 100%;
+      }
+      .nav-cta {
+        padding: 8px 22px;
+        background: linear-gradient(135deg, var(--g3), var(--g2));
+        color: var(--white) !important;
+        border-radius: 8px;
+        font-weight: 500 !important;
+      }
+      .nav-cta::after {
+        display: none !important;
+      }
+      .burger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        padding: 4px;
+      }
+      .burger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--gp);
+        border-radius: 2px;
+      }
+      .mob-menu {
+        display: none;
+        position: fixed;
+        top: 68px;
+        left: 0;
+        right: 0;
+        background: rgba(26, 58, 42, 0.97);
+        backdrop-filter: blur(16px);
+        padding: 20px 5%;
+        flex-direction: column;
+        gap: 16px;
+        border-bottom: 1px solid rgba(168, 213, 176, 0.1);
+        z-index: 99;
+      }
+      .mob-menu a {
+        color: var(--gp);
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(168, 213, 176, 0.08);
+      }
+      .mob-menu.open {
+        display: flex;
+      }
+
+      /* ─── Page hero ─── */
+      .page-hero {
+        padding: 140px 24px 60px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      .page-hero .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(200, 168, 75, 0.12);
+        border: 1px solid rgba(200, 168, 75, 0.3);
+        border-radius: 99px;
+        padding: 6px 18px;
+        font-size: 0.78rem;
+        color: var(--gold);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+      .page-hero h1 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2rem, 6vw, 4rem);
+        font-weight: 900;
+        color: var(--white);
+      }
+      .page-hero h1 span {
+        color: var(--gp);
+      }
+      .page-hero p {
+        color: var(--gp);
+        font-size: 1rem;
+        line-height: 1.75;
+        max-width: 520px;
+        margin: 16px auto 0;
+        font-weight: 300;
+      }
+
+      /* ─── Layout ─── */
+      .contact-layout {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 60px 24px;
+        display: grid;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 40px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ─── Info panel ─── */
+      .info-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.4rem;
+        color: var(--white);
+        margin-bottom: 20px;
+      }
+      .info-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(168, 213, 176, 0.15);
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        transition: border-color 0.2s;
+      }
+      .info-card:hover {
+        border-color: rgba(168, 213, 176, 0.35);
+      }
+      .info-icon {
+        font-size: 1.6rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .info-card h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 0.95rem;
+        color: var(--white);
+        margin-bottom: 4px;
+      }
+      .info-card p {
+        font-size: 0.83rem;
+        color: var(--gp);
+        line-height: 1.6;
+        font-weight: 300;
+      }
+      .info-card a {
+        color: var(--gp);
+        text-decoration: none;
+      }
+      .info-card a:hover {
+        color: var(--white);
+      }
+
+      /* FAQ */
+      .faq {
+        margin-top: 28px;
+      }
+      .faq h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+        color: var(--white);
+        margin-bottom: 16px;
+      }
+      .faq-item {
+        border-bottom: 1px solid rgba(168, 213, 176, 0.1);
+        padding: 12px 0;
+      }
+      .faq-q {
+        color: var(--cream);
+        font-size: 0.87rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+      .faq-q:hover {
+        color: var(--white);
+      }
+      .faq-icon {
+        color: var(--gold);
+        font-size: 0.9rem;
+        transition: transform 0.3s;
+        flex-shrink: 0;
+      }
+      .faq-a {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+        font-size: 0.83rem;
+        color: var(--gp);
+        line-height: 1.65;
+        font-weight: 300;
+      }
+      .faq-item.open .faq-a {
+        max-height: 120px;
+        padding-top: 8px;
+      }
+      .faq-item.open .faq-icon {
+        transform: rotate(45deg);
+      }
+
+      /* ─── Form ─── */
+      .form-panel {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(168, 213, 176, 0.18);
+        border-radius: 24px;
+        padding: 40px 36px;
+        backdrop-filter: blur(12px);
+      }
+      .form-panel h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        color: var(--white);
+        margin-bottom: 8px;
+      }
+      .form-panel .sub {
+        color: var(--gp);
+        font-size: 0.85rem;
+        margin-bottom: 28px;
+        font-weight: 300;
+      }
+      .field {
+        margin-bottom: 18px;
+      }
+      .field label {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--gp);
+        margin-bottom: 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(168, 213, 176, 0.18);
+        border-radius: 10px;
+        color: var(--cream);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.92rem;
+        outline: none;
+        transition: border 0.2s;
+        resize: none;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: rgba(168, 213, 176, 0.5);
+        background: rgba(255, 255, 255, 0.09);
+      }
+      .field select option {
+        background: #1a3a2a;
+        color: var(--cream);
+      }
+      .field textarea {
+        min-height: 130px;
+      }
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .btn-submit {
+        width: 100%;
+        margin-top: 8px;
+        padding: 15px;
+        background: linear-gradient(135deg, var(--g3), var(--g2));
+        color: var(--white);
+        font-family: "DM Sans", sans-serif;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(74, 148, 99, 0.45);
+      }
+      .btn-submit:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .alert {
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .alert-ok {
+        background: rgba(74, 148, 99, 0.2);
+        border: 1px solid rgba(74, 148, 99, 0.4);
+        color: #a8d5b0;
+      }
+      .alert-err {
+        background: rgba(192, 57, 43, 0.2);
+        border: 1px solid rgba(192, 57, 43, 0.4);
+        color: #f1948a;
+      }
+
+      /* ─── Map placeholder ─── */
+      .map-section {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 0 24px 70px;
+        position: relative;
+        z-index: 1;
+      }
+      .map-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(168, 213, 176, 0.15);
+        border-radius: 20px;
+        padding: 36px;
+        text-align: center;
+      }
+      .map-box h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.2rem;
+        color: var(--white);
+        margin-bottom: 8px;
+      }
+      .map-box p {
+        color: var(--gp);
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+      }
+      .map-badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 16px;
+      }
+      .map-badge {
+        background: rgba(74, 148, 99, 0.12);
+        border: 1px solid rgba(168, 213, 176, 0.2);
+        border-radius: 99px;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+        color: var(--gp);
+      }
+
+      footer {
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(168, 213, 176, 0.08);
+        padding: 24px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      footer p {
+        color: rgba(168, 213, 176, 0.35);
+        font-size: 0.75rem;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity 0.65s ease,
+          transform 0.65s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 760px) {
+        .nav-links {
+          display: none;
+        }
+        .burger {
+          display: flex;
+        }
+        .contact-layout {
+          grid-template-columns: 1fr;
+        }
+        .row2 {
+          grid-template-columns: 1fr;
+        }
+        .form-panel {
+          padding: 26px 20px;
+        }
+      }
+      .login-btn {
+        padding: 6px 14px;
+        border: 1px solid #4caf50;
+        border-radius: 6px;
+        color: #4caf50;
+        text-decoration: none;
+      }
+
+      .register-btn {
+        padding: 6px 14px;
+        background: #4caf50;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+      }
+
+      .user-name {
+        font-weight: 600;
+      }
+
+      .logout-btn {
+        padding: 6px 10px;
+        background: #e74c3c;
+        border: none;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <script>
+      
+      const TOKEN_KEY = "cardamom_token";
+      const USER_KEY = "cardamom_user";
+
+      const token = localStorage.getItem(TOKEN_KEY);
+      const user = localStorage.getItem(USER_KEY);
+
+      // 🔒 Protect page
+      if (!token) {
+        localStorage.setItem("redirectAfterLogin", window.location.pathname);
+        window.location.href = "login.html";
+      }
+
+      // Navbar + greeting
+      document.addEventListener("DOMContentLoaded", () => {
+        const navAuth = document.getElementById("cdx-nav-auth");
+        if (navAuth && user) {
+          navAuth.innerHTML = `
+      <span class="user-name">👤 ${user}</span>
+      <button id="logout-btn" class="logout-btn">Logout</button>
+    `;
+
+          document
+            .getElementById("logout-btn")
+            .addEventListener("click", () => {
+              localStorage.removeItem(TOKEN_KEY);
+              localStorage.removeItem(USER_KEY);
+              window.location.href = "login.html";
+            });
+
+          document
+            .getElementById("logout-btn")
+            .addEventListener("click", () => {
+              localStorage.removeItem(TOKEN_KEY);
+              localStorage.removeItem(USER_KEY);
+              window.location.href = "login.html";
+            });
+        }
+
+        const userGreeting = document.getElementById("user-greeting");
+        if (userGreeting && user) {
+          userGreeting.innerHTML = `Hello, <strong>${user}</strong>`;
+        }
+      });
+    </script>
+
+    <nav id="navbar">
+      <a href="index.html" class="nav-brand"><span>🌿</span><strong>अलैँची</strong></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html" class="active">Contact</a>
+        <button
+          id="lang-toggle-btn"
+          onclick="toggleLang()"
+          style="
+            padding: 7px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #9db8a5;
+            font-family: &quot;Outfit&quot;, sans-serif;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+          "
+        >
+          🇳🇵 नेपाली
+        </button>
+
+        <!-- Shown when logged in -->
+        <div
+          id="nav-user-badge"
+          style="display: none; align-items: center; gap: 10px"
+        >
+          <span style="font-size: 0.83rem; color: #9db8a5"
+            >👤 <span id="nav-user-name">User</span></span
+          >
+          <a
+            id="nav-app-btn"
+            href="app.html"
+            style="
+              padding: 8px 16px;
+              background: rgba(82, 196, 122, 0.12);
+              border: 1px solid rgba(82, 196, 122, 0.25);
+              border-radius: 8px;
+              color: #52c47a;
+              font-size: 0.83rem;
+              text-decoration: none;
+              font-family: &quot;Outfit&quot;, sans-serif;
+            "
+          >
+            Dashboard →
+          </a>
+          <button
+            id="nav-logout-btn"
+            style="
+              padding: 8px 15px;
+              background: rgba(192, 57, 43, 0.12);
+              border: 1px solid rgba(192, 57, 43, 0.22);
+              border-radius: 8px;
+              color: #f1948a;
+              font-family: &quot;Outfit&quot;, sans-serif;
+              font-size: 0.8rem;
+              cursor: pointer;
+            "
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+      <div class="burger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div
+        id="cdx-nav-auth"
+        style="display: flex; align-items: center; gap: 8px"
+      ></div>
+    </nav>
+    <div class="mob-menu" id="mob">
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">ℹ️ About</a>
+      <a href="blog.html">📰 Blog</a>
+      <a href="contact.html">📬 Contact</a>
+      <div id="cdx-mob-auth"></div>
+      <a href="app.html">🔬 Detect Disease</a>
+    </div>
+
+    <div class="page-hero">
+      <div class="badge">📬 Get in Touch</div>
+      <h1>Contact <span>Us</span></h1>
+      <p>
+        Questions about the project, collaboration requests, or just want to say
+        hello — we'd love to hear from you.
+      </p>
+    </div>
+
+    <div class="contact-layout">
+      <!-- Info -->
+      <div class="info-panel reveal">
+        <div class="info-title">Reach Out</div>
+
+        <div class="info-card">
+          <div class="info-icon">📧</div>
+          <div>
+            <h4>Email</h4>
+            <p>
+              <a
+                href="/cdn-cgi/l/email-protection#d5b6b4a7b1b4b8bab8b1ad95b0adb4b8a5b9b0fbb6bab8"
+                ><span
+                  class="__cf_email__"
+                  data-cfemail="b9dad8cbddd8d4d6d4ddc1f9dcc1d8d4c9d5dc97dad6d4"
+                  >[dahalkushal00@gmail.com]</span
+                ></a
+              >
+            </p>
+            <p>We reply within 24 hours on working days</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🏫</div>
+          <div>
+            <h4>Institution</h4>
+            <p>
+              Institute of Science and Technology<br />
+              Tribhuvan University <br />Nepal
+            </p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🇳🇵</div>
+          <div>
+            <h4>Location</h4>
+            <p>
+              Biratnagar, Nepal<br />Field research: Sankhuwasabha Districts
+            </p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">⏰</div>
+          <div>
+            <h4>Response Time</h4>
+            <p>
+              Sun – Fri · 9:00 AM – 5:00 PM (NST)<br />Usually faster during
+              semester
+            </p>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq">
+          <h3>Quick Questions</h3>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Is अलैँची free to use? <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+              Yes, completely free. Create an account and start detecting
+              diseases at no cost.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              What image formats are supported? <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+              JPG, PNG, and BMP formats are supported. For best results, ensure
+              the leaf is well-lit and occupies most of the frame.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Can I use it offline? <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+              Currently no — it requires an internet connection to send the
+              image to the server for analysis. Offline mobile support is
+              planned.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              How accurate is the model? <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+              Our EfficientNetB0 and MobileNetV2 models achieve 97% accuracy on the test dataset
+              collected from Nepali farms.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="form-panel reveal">
+        <h2>Send a Message</h2>
+        <p class="sub">
+          Fill the form and we'll get back to you promptly · सन्देश पठाउनुहोस्
+        </p>
+        <div class="alert alert-ok" id="ok-alert">
+          ✅ Message sent! We'll be in touch soon.
+        </div>
+        <div class="alert alert-err" id="err-alert">
+          ❌ Please fill all required fields.
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="fname">First Name *</label>
+            <input type="text" id="fname" placeholder="Ram" />
+          </div>
+          <div class="field">
+            <label for="lname">Last Name *</label>
+            <input type="text" id="lname" placeholder="Bahadur" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="topic">Topic</label>
+          <select id="topic">
+            <option value="">Select a topic…</option>
+            <option>General Inquiry</option>
+            <option>Technical Support</option>
+            <option>Research Collaboration</option>
+            <option>Bug Report</option>
+            <option>Feature Request</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="msg">Message *</label>
+          <textarea id="msg" placeholder="Write your message here…"></textarea>
+        </div>
+        <button class="btn-submit" id="send-btn" onclick="submitContact()">
+          <span>📨</span> Send Message
+        </button>
+      </div>
+    </div>
+
+    <!-- Map / Location -->
+    <div class="map-section">
+      <div class="map-box reveal">
+        <div style="font-size: 3rem; margin-bottom: 12px">🗺️</div>
+        <h3>Cardamom Growing Regions — Nepal</h3>
+        <p>
+          Our dataset and farmer partnerships span the major cardamom-producing
+          districts of eastern Nepal.
+        </p>
+        <div class="map-badge-row">
+          <span class="map-badge">📍 Sankhuwasabha</span>
+          <span class="map-badge">📍 Ilam</span>
+          <span class="map-badge">📍 Taplejung</span>
+          <span class="map-badge">📍 Panchthar</span>
+          <span class="map-badge">📍 Terhathum</span>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 अलैँची · Nepal 🇳🇵 · एलाइची रोग पहिचान प्रणाली</p>
+    </footer>
+
+    <script src="static/config.js"></script>
+    <script>
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("visible");
+          });
+        },
+        { threshold: 0.1 },
+      );
+      document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
+
+      function toggleFaq(el) {
+        el.parentElement.classList.toggle("open");
+      }
+
+      async function submitContact(event) {
+        if (event) event.preventDefault();
+
+        const fnameEl = document.getElementById("fname");
+        const lnameEl = document.getElementById("lname");
+        const emailEl = document.getElementById("email");
+        const msgEl = document.getElementById("msg");
+        const topicEl = document.getElementById("topic");
+
+        const okA = document.getElementById("ok-alert");
+        const errA = document.getElementById("err-alert");
+        const btn = document.getElementById("send-btn");
+
+        // Safety check
+        if (
+          !fnameEl ||
+          !lnameEl ||
+          !emailEl ||
+          !msgEl ||
+          !topicEl ||
+          !okA ||
+          !errA ||
+          !btn
+        ) {
+          console.error("One or more elements not found!");
+          return;
+        }
+
+        const name = fnameEl.value.trim() + " " + lnameEl.value.trim();
+        const email = emailEl.value.trim();
+        const msg = msgEl.value.trim();
+        const subject = topicEl.value;
+
+        // Reset alerts
+        okA.style.display = "none";
+        errA.style.display = "none";
+
+        if (!name.trim() || !email || !msg) {
+          errA.style.display = "block";
+          return;
+        }
+
+        try {
+          // Button loading
+          btn.disabled = true;
+          btn.innerHTML = "<span>⏳</span> Sending…";
+
+          // API call
+          const res = await fetch(`${API_BASE}api/contact`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, subject, message: msg }),
+          });
+
+          if (!res.ok) {
+            throw new Error("Server error: " + res.status);
+          }
+
+          const data = await res.json();
+
+          if (data.error) {
+            errA.style.display = "block";
+            return;
+          }
+
+          // Success
+          okA.style.display = "block";
+
+          // Clear form
+          fnameEl.value = "";
+          lnameEl.value = "";
+          emailEl.value = "";
+          msgEl.value = "";
+          topicEl.value = "";
+        } catch (error) {
+          console.error(error);
+          errA.style.display = "block";
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "<span>📨</span> Send Message";
+        }
+      }
+    </script>
+  </body>
+</html>

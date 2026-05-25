@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profile Sidebar – अलैँची</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --g1: #0e1f16;
+      --g2: #162d1e;
+      --g3: #1f4029;
+      --g4: #2d6642;
+      --g5: #3d8c5a;
+      --gp: #7ec89a;
+      --gpl: #b8dfc6;
+      --cream: #f2ece0;
+      --gold: #c9a84c;
+      --white: #fff;
+      --red: rgba(192,57,43,1);
+      --sidebar-w: 400px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--g1);
+      color: var(--cream);
+      min-height: 100vh;
+    }
+
+    /* ── Demo trigger button (remove in real app, use your nav avatar) ── */
+    .demo-trigger {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--g5), var(--g4));
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.03em;
+    }
+    .demo-trigger:hover {
+      transform: translate(-50%, -52%);
+      box-shadow: 0 14px 36px rgba(61,140,90,0.45);
+    }
+
+    /* ── Backdrop ── */
+    .profile-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(8,16,11,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .profile-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Sidebar ── */
+    .profile-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: var(--sidebar-w);
+      max-width: 100vw;
+      height: 100vh;
+      background: var(--g2);
+      border-left: 1px solid rgba(126,200,154,0.1);
+      z-index: 900;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .profile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Top decorative line */
+    .profile-sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--g5), var(--gold), var(--g5), transparent);
+    }
+
+    /* ── Header ── */
+    .ps-header {
+      padding: 24px 24px 0;
+      flex-shrink: 0;
+    }
+    .ps-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .ps-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.02em;
+    }
+    .ps-close {
+      width: 34px;
+      height: 34px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(126,200,154,0.12);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .ps-close:hover {
+      background: rgba(192,57,43,0.12);
+      border-color: rgba(192,57,43,0.25);
+    }
+    .ps-close svg {
+      width: 14px; height: 14px;
+      stroke: rgba(184,223,198,0.6);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      transition: stroke 0.2s;
+    }
+    .ps-close:hover svg { stroke: #f1948a; }
+
+    /* ── Avatar section ── */
+    .ps-avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 24px 24px;
+      border-bottom: 1px solid rgba(126,200,154,0.07);
+    }
+    .ps-avatar-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .ps-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--g4), var(--g5));
+      border: 2px solid rgba(126,200,154,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      overflow: hidden;
+      position: relative;
+    }
+    .ps-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      display: none;
+    }
+    .ps-avatar-edit {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 26px;
+      height: 26px;
+      background: var(--g5);
+      border: 2px solid var(--g2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ps-avatar-edit:hover { background: var(--g4); transform: scale(1.1); }
+    .ps-avatar-edit svg {
+      width: 11px; height: 11px;
+      stroke: var(--white);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+    .ps-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 3px;
+      letter-spacing: 0.01em;
+    }
+    .ps-role {
+      font-size: 0.72rem;
+      color: var(--gp);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 400;
+      opacity: 0.7;
+      margin-bottom: 14px;
+    }
+    .ps-stats-row {
+      display: flex;
+      gap: 0;
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(126,200,154,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ps-stat {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      border-right: 1px solid rgba(126,200,154,0.07);
+    }
+    .ps-stat:last-child { border-right: none; }
+    .ps-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: var(--white);
+      font-weight: 700;
+      line-height: 1;
+    }
+    .ps-stat-lbl {
+      font-size: 0.63rem;
+      color: rgba(126,200,154,0.5);
+      margin-top: 3px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Tabs ── */
+    .ps-tabs {
+      display: flex;
+      gap: 0;
+      padding: 16px 24px 0;
+      border-bottom: 1px solid rgba(126,200,154,0.07);
+      flex-shrink: 0;
+    }
+    .ps-tab {
+      flex: 1;
+      padding: 9px 0;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: rgba(184,223,198,0.45);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+    .ps-tab.active {
+      color: var(--gp);
+      border-bottom-color: var(--g5);
+    }
+    .ps-tab:hover:not(.active) { color: rgba(184,223,198,0.7); }
+
+    /* ── Body (scrollable) ── */
+    .ps-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(126,200,154,0.15) transparent;
+    }
+    .ps-body::-webkit-scrollbar { width: 4px; }
+    .ps-body::-webkit-scrollbar-track { background: transparent; }
+    .ps-body::-webkit-scrollbar-thumb {
+      background: rgba(126,200,154,0.15);
+      border-radius: 2px;
+    }
+
+    /* Tab panels */
+    .ps-panel { display: none; }
+    .ps-panel.active { display: block; }
+
+    /* ── Section label ── */
+    .ps-section-lbl {
+      font-size: 0.63rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin-bottom: 12px;
+      margin-top: 20px;
+      opacity: 0.75;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ps-section-lbl::before {
+      content: '';
+      display: inline-block;
+      width: 16px; height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+    .ps-section-lbl:first-child { margin-top: 0; }
+
+    /* ── Info row (view mode) ── */
+    .ps-info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(126,200,154,0.07);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    .ps-info-row:hover { background: rgba(255,255,255,0.04); }
+    .ps-info-icon {
+      width: 32px; height: 32px;
+      background: rgba(61,140,90,0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .ps-info-icon svg {
+      width: 14px; height: 14px;
+      stroke: var(--gp);
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+    }
+    .ps-info-content { flex: 1; min-width: 0; }
+    .ps-info-lbl {
+      font-size: 0.63rem;
+      color: rgba(126,200,154,0.5);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .ps-info-val {
+      font-size: 0.85rem;
+      color: var(--cream);
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Form fields (edit mode) ── */
+    .ps-field {
+      margin-bottom: 14px;
+    }
+    .ps-label {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(126,200,154,0.55);
+      margin-bottom: 7px;
+      font-weight: 500;
+    }
+    .ps-input {
+      width: 100%;
+      padding: 10px 13px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(126,200,154,0.12);
+      border-radius: 9px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.87rem;
+      font-weight: 300;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .ps-input:focus {
+      border-color: rgba(126,200,154,0.35);
+      background: rgba(126,200,154,0.04);
+      box-shadow: 0 0 0 3px rgba(61,140,90,0.08);
+    }
+    .ps-input::placeholder { color: rgba(184,223,198,0.25); }
+    .ps-input:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .ps-input-hint {
+      font-size: 0.68rem;
+      color: rgba(126,200,154,0.35);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* Password strength */
+    .ps-strength {
+      display: flex;
+      gap: 3px;
+      margin-top: 7px;
+    }
+    .ps-strength-bar {
+      flex: 1;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.08);
+      transition: background 0.3s;
+    }
+    .ps-strength-bar.weak { background: #e74c3c; }
+    .ps-strength-bar.medium { background: var(--gold); }
+    .ps-strength-bar.strong { background: var(--gp); }
+    .ps-strength-label {
+      font-size: 0.65rem;
+      color: rgba(126,200,154,0.4);
+      margin-top: 4px;
+      transition: color 0.3s;
+    }
+
+    /* ── Activity feed ── */
+    .ps-activity-item {
+      display: flex;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(126,200,154,0.06);
+      align-items: flex-start;
+    }
+    .ps-activity-item:last-child { border-bottom: none; }
+    .ps-activity-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .ps-activity-content { flex: 1; min-width: 0; }
+    .ps-activity-text {
+      font-size: 0.82rem;
+      color: rgba(242,236,224,0.75);
+      line-height: 1.5;
+      font-weight: 300;
+    }
+    .ps-activity-text strong { color: var(--white); font-weight: 500; }
+    .ps-activity-time {
+      font-size: 0.68rem;
+      color: rgba(126,200,154,0.35);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Danger zone ── */
+    .ps-danger-box {
+      background: rgba(192,57,43,0.06);
+      border: 1px solid rgba(192,57,43,0.18);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .ps-danger-title {
+      font-size: 0.78rem;
+      color: #f1948a;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .ps-danger-desc {
+      font-size: 0.75rem;
+      color: rgba(241,148,138,0.55);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .ps-danger-btn {
+      padding: 8px 16px;
+      background: rgba(192,57,43,0.1);
+      border: 1px solid rgba(192,57,43,0.28);
+      border-radius: 8px;
+      color: #f1948a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ps-danger-btn:hover {
+      background: rgba(192,57,43,0.18);
+      border-color: rgba(192,57,43,0.45);
+    }
+
+    /* ── Footer actions ── */
+    .ps-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(126,200,154,0.07);
+      flex-shrink: 0;
+      display: flex;
+      gap: 10px;
+    }
+    .ps-btn-cancel {
+      flex: 1;
+      padding: 11px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(126,200,154,0.12);
+      border-radius: 10px;
+      color: rgba(184,223,198,0.65);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ps-btn-cancel:hover {
+      background: rgba(255,255,255,0.07);
+      color: var(--white);
+    }
+    .ps-btn-save {
+      flex: 2;
+      padding: 11px;
+      background: linear-gradient(135deg, var(--g5), var(--g4));
+      border: none;
+      border-radius: 10px;
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .ps-btn-save::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), transparent);
+    }
+    .ps-btn-save:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(61,140,90,0.35);
+    }
+    .ps-btn-save:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ── Toast ── */
+    #ps-toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      border-radius: 10px;
+      padding: 11px 18px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.84rem;
+      z-index: 9999;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      border: 1px solid transparent;
+      min-width: 200px;
+    }
+    #ps-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ── Status badge ── */
+    .ps-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .ps-status::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      animation: blink 2s infinite;
+    }
+    .ps-status.active {
+      background: rgba(61,140,90,0.15);
+      color: var(--gp);
+    }
+    .ps-status.active::before { background: var(--gp); }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── Loading spinner ── */
+    .ps-spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Demo trigger button (in real app: hook to your nav avatar click) -->
+  <button class="demo-trigger" onclick="openProfileSidebar()">
+    👤 Open Profile Sidebar
+  </button>
+
+  <!-- ── Backdrop ── -->
+  <div class="profile-backdrop" id="profileBackdrop" onclick="closeProfileSidebar()"></div>
+
+  <!-- ── Sidebar ── -->
+  <div class="profile-sidebar" id="profileSidebar">
+
+    <!-- Header -->
+    <div class="ps-header">
+      <div class="ps-header-row">
+        <span class="ps-title">Account Profile</span>
+        <button class="ps-close" onclick="closeProfileSidebar()" title="Close">
+          <svg viewBox="0 0 14 14"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Avatar + stats -->
+    <div class="ps-avatar-section">
+      <div class="ps-avatar-wrap">
+        <div class="ps-avatar" id="psAvatar">
+          <img id="psAvatarImg" src="" alt="" />
+          <span id="psAvatarInitials">R</span>
+        </div>
+        <div class="ps-avatar-edit" onclick="document.getElementById('psAvatarInput').click()" title="Change photo">
+          <svg viewBox="0 0 16 16"><path d="M11 2.5l2.5 2.5L4 14.5H1.5V12L11 2.5z"/></svg>
+        </div>
+        <input type="file" id="psAvatarInput" accept="image/*" style="display:none" onchange="handleAvatarChange(this)" />
+      </div>
+      <div class="ps-name" id="psDisplayName">Ram Bahadur</div>
+      <div class="ps-role">Cardamom Farmer</div>
+      <div id="psStatusBadge" class="ps-status active" style="margin-bottom:16px;">Active</div>
+      <div class="ps-stats-row">
+        <div class="ps-stat">
+          <div class="ps-stat-num" id="psTotalScans">—</div>
+          <div class="ps-stat-lbl">Scans</div>
+        </div>
+        <div class="ps-stat">
+          <div class="ps-stat-num" id="psDiseases">—</div>
+          <div class="ps-stat-lbl">Diseases</div>
+        </div>
+        <div class="ps-stat">
+          <div class="ps-stat-num" id="psMemberDays">—</div>
+          <div class="ps-stat-lbl">Days</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="ps-tabs">
+      <button class="ps-tab active" onclick="switchPsTab('info', this)">Info</button>
+      <button class="ps-tab" onclick="switchPsTab('edit', this)">Edit Profile</button>
+      <button class="ps-tab" onclick="switchPsTab('security', this)">Security</button>
+      <button class="ps-tab" onclick="switchPsTab('activity', this)">Activity</button>
+    </div>
+
+    <!-- Body -->
+    <div class="ps-body">
+
+      <!-- ── INFO TAB ── -->
+      <div class="ps-panel active" id="ps-panel-info">
+        <p class="ps-section-lbl">Personal Information</p>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Full Name</div>
+            <div class="ps-info-val" id="infoName">Ram Bahadur Thapa</div>
+          </div>
+        </div>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Email</div>
+            <div class="ps-info-val" id="infoEmail">ram@example.com</div>
+          </div>
+        </div>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.68 18z"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Phone</div>
+            <div class="ps-info-val" id="infoPhone">+977 98XXXXXXXX</div>
+          </div>
+        </div>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">District</div>
+            <div class="ps-info-val" id="infoDistrict">Ilam, Province No. 1</div>
+          </div>
+        </div>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Member Since</div>
+            <div class="ps-info-val" id="infoJoined">—</div>
+          </div>
+        </div>
+
+        <p class="ps-section-lbl">Farm Details</p>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Farm Size</div>
+            <div class="ps-info-val" id="infoFarmSize">Not set</div>
+          </div>
+        </div>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Experience</div>
+            <div class="ps-info-val" id="infoExperience">Not set</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EDIT TAB ── -->
+      <div class="ps-panel" id="ps-panel-edit">
+        <p class="ps-section-lbl">Personal Details</p>
+
+        <div class="ps-field">
+          <label class="ps-label">Full Name</label>
+          <input type="text" class="ps-input" id="editName" placeholder="Your full name" />
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">Email Address</label>
+          <input type="email" class="ps-input" id="editEmail" placeholder="your@email.com" />
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">Phone Number</label>
+          <input type="tel" class="ps-input" id="editPhone" placeholder="+977 98XXXXXXXX" />
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">District</label>
+          <select class="ps-input" id="editDistrict">
+            <option value="">Select district…</option>
+            <option>Ilam</option>
+            <option>Taplejung</option>
+            <option>Panchthar</option>
+            <option>Sankhuwasabha</option>
+            <option>Terhathum</option>
+            <option>Dhankuta</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <p class="ps-section-lbl">Farm Details</p>
+
+        <div class="ps-field">
+          <label class="ps-label">Farm Size (Ropani)</label>
+          <input type="number" class="ps-input" id="editFarmSize" placeholder="e.g. 12" min="0" />
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">Years of Experience</label>
+          <select class="ps-input" id="editExperience">
+            <option value="">Select…</option>
+            <option>Less than 1 year</option>
+            <option>1–3 years</option>
+            <option>3–5 years</option>
+            <option>5–10 years</option>
+            <option>10+ years</option>
+          </select>
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">Bio / Notes</label>
+          <textarea class="ps-input" id="editBio" rows="3" placeholder="Tell us about your farm…" style="resize:vertical; line-height:1.6;"></textarea>
+        </div>
+      </div>
+
+      <!-- ── SECURITY TAB ── -->
+      <div class="ps-panel" id="ps-panel-security">
+        <p class="ps-section-lbl">Change Password</p>
+
+        <div class="ps-field">
+          <label class="ps-label">Current Password</label>
+          <input type="password" class="ps-input" id="secCurrentPw" placeholder="••••••••" />
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">New Password</label>
+          <input type="password" class="ps-input" id="secNewPw" placeholder="••••••••" oninput="checkStrength(this.value)" />
+          <div class="ps-strength">
+            <div class="ps-strength-bar" id="sb1"></div>
+            <div class="ps-strength-bar" id="sb2"></div>
+            <div class="ps-strength-bar" id="sb3"></div>
+            <div class="ps-strength-bar" id="sb4"></div>
+          </div>
+          <div class="ps-strength-label" id="strengthLabel">Enter a password</div>
+        </div>
+        <div class="ps-field">
+          <label class="ps-label">Confirm New Password</label>
+          <input type="password" class="ps-input" id="secConfirmPw" placeholder="••••••••" />
+          <div class="ps-input-hint">Minimum 8 characters recommended</div>
+        </div>
+
+        <p class="ps-section-lbl">Sessions</p>
+
+        <div class="ps-info-row">
+          <div class="ps-info-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="ps-info-content">
+            <div class="ps-info-lbl">Current Session</div>
+            <div class="ps-info-val">This device · Active now</div>
+          </div>
+        </div>
+
+        <p class="ps-section-lbl">Danger Zone</p>
+        <div class="ps-danger-box">
+          <div class="ps-danger-title">Delete Account</div>
+          <div class="ps-danger-desc">Permanently delete your account and all prediction history. This cannot be undone.</div>
+          <button class="ps-danger-btn" onclick="confirmDeleteAccount()">Delete My Account</button>
+        </div>
+      </div>
+
+      <!-- ── ACTIVITY TAB ── -->
+      <div class="ps-panel" id="ps-panel-activity">
+        <p class="ps-section-lbl">Recent Activity</p>
+        <div id="psActivityFeed">
+          <div style="text-align:center; padding:28px; color:rgba(126,200,154,0.35); font-size:0.83rem;">
+            Loading activity…
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ps-body -->
+
+    <!-- Footer actions -->
+    <div class="ps-footer" id="psFooter">
+      <button class="ps-btn-cancel" onclick="closeProfileSidebar()">Cancel</button>
+      <button class="ps-btn-save" id="psSaveBtn" onclick="saveProfile()">Save Changes</button>
+    </div>
+
+  </div><!-- /profile-sidebar -->
+
+  <!-- Toast -->
+  <div id="ps-toast"></div>
+
+  <script>
+    /* ═══════════════════════════════════════
+       CONFIG — point these to your API
+    ═══════════════════════════════════════ */
+    const API_BASE = (typeof window.API_BASE !== 'undefined') ? window.API_BASE : 'http://127.0.0.1:5000';
+    function getToken() { return localStorage.getItem('cardamom_token') || localStorage.getItem('token') || ''; }
+    function getUsername() { return localStorage.getItem('cardamom_user') || 'User'; }
+
+    async function apiCall(endpoint, method = 'GET', body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      const tok = getToken();
+      if (tok) opts.headers['Authorization'] = 'Bearer ' + tok;
+      if (body) opts.body = JSON.stringify(body);
+      try {
+        const url = API_BASE.replace(/\/$/, '') + '/' + endpoint.replace(/^\//, '');
+        const res = await fetch(url, opts);
+        return await res.json().catch(() => ({}));
+      } catch { return { error: 'Network error' }; }
+    }
+
+    /* ═══════════════════════════════════════
+       OPEN / CLOSE
+    ═══════════════════════════════════════ */
+    function openProfileSidebar() {
+      document.getElementById('profileBackdrop').classList.add('open');
+      document.getElementById('profileSidebar').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      loadProfileData();
+    }
+
+    function closeProfileSidebar() {
+      document.getElementById('profileBackdrop').classList.remove('open');
+      document.getElementById('profileSidebar').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeProfileSidebar();
+    });
+
+    /* ═══════════════════════════════════════
+       TAB SWITCH
+    ═══════════════════════════════════════ */
+    function switchPsTab(tab, btn) {
+      document.querySelectorAll('.ps-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.ps-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('ps-panel-' + tab).classList.add('active');
+
+      // Show/hide footer based on tab
+      const footer = document.getElementById('psFooter');
+      footer.style.display = (tab === 'info' || tab === 'activity') ? 'none' : 'flex';
+
+      // Load activity on demand
+      if (tab === 'activity') loadActivity();
+    }
+
+    /* ═══════════════════════════════════════
+       LOAD PROFILE DATA
+    ═══════════════════════════════════════ */
+    async function loadProfileData() {
+      // Try to get from your /api/profile or /api/me endpoint
+      const data = await apiCall('api/profile', 'GET');
+
+      const name     = data.name     || data.username || getUsername() || 'User';
+      const email    = data.email    || '—';
+      const phone    = data.phone    || 'Not set';
+      const district = data.district || 'Not set';
+      const joined   = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '—';
+      const farmSize = data.farm_size ? data.farm_size + ' Ropani' : 'Not set';
+      const experience = data.experience || 'Not set';
+      const totalScans = data.total_scans ?? '—';
+      const diseases   = data.unique_diseases ?? '—';
+      const memberDays = data.created_at ? Math.floor((Date.now() - new Date(data.created_at)) / 86400000) : '—';
+
+      // Avatar initials
+      const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('psAvatarInitials').textContent = initials;
+      document.getElementById('psDisplayName').textContent = name;
+
+      // Info tab
+      document.getElementById('infoName').textContent      = name;
+      document.getElementById('infoEmail').textContent     = email;
+      document.getElementById('infoPhone').textContent     = phone;
+      document.getElementById('infoDistrict').textContent  = district;
+      document.getElementById('infoJoined').textContent    = joined;
+      document.getElementById('infoFarmSize').textContent  = farmSize;
+      document.getElementById('infoExperience').textContent = experience;
+
+      // Stats
+      document.getElementById('psTotalScans').textContent = totalScans;
+      document.getElementById('psDiseases').textContent   = diseases;
+      document.getElementById('psMemberDays').textContent = memberDays;
+
+      // Pre-fill edit form
+      document.getElementById('editName').value      = name !== '—' ? name : '';
+      document.getElementById('editEmail').value     = email !== '—' ? email : '';
+      document.getElementById('editPhone').value     = phone !== 'Not set' ? phone : '';
+      document.getElementById('editBio').value       = data.bio || '';
+      setSelectValue('editDistrict', district);
+      setSelectValue('editExperience', experience);
+      if (data.farm_size) document.getElementById('editFarmSize').value = data.farm_size;
+    }
+
+    function setSelectValue(id, val) {
+      const sel = document.getElementById(id);
+      for (const opt of sel.options) {
+        if (opt.value === val || opt.text === val) { sel.value = opt.value; break; }
+      }
+    }
+
+    /* ═══════════════════════════════════════
+       SAVE PROFILE
+    ═══════════════════════════════════════ */
+    async function saveProfile() {
+      const activePanel = document.querySelector('.ps-panel.active').id;
+      const btn = document.getElementById('psSaveBtn');
+
+      if (activePanel === 'ps-panel-edit') {
+        const payload = {
+          name:       document.getElementById('editName').value.trim(),
+          email:      document.getElementById('editEmail').value.trim(),
+          phone:      document.getElementById('editPhone').value.trim(),
+          district:   document.getElementById('editDistrict').value,
+          farm_size:  document.getElementById('editFarmSize').value,
+          experience: document.getElementById('editExperience').value,
+          bio:        document.getElementById('editBio').value.trim(),
+        };
+        if (!payload.name || !payload.email) {
+          showPsToast('Name and email are required', 'error'); return;
+        }
+        btn.disabled = true;
+        btn.innerHTML = '<span class="ps-spinner"></span> Saving…';
+        const res = await apiCall('api/profile', 'PUT', payload);
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        if (res.error) { showPsToast('Error: ' + res.error, 'error'); return; }
+        showPsToast('Profile updated successfully', 'success');
+        loadProfileData();
+      }
+
+      if (activePanel === 'ps-panel-security') {
+        const current = document.getElementById('secCurrentPw').value;
+        const newPw   = document.getElementById('secNewPw').value;
+        const confirm = document.getElementById('secConfirmPw').value;
+        if (!current || !newPw || !confirm) {
+          showPsToast('Please fill all password fields', 'error'); return;
+        }
+        if (newPw !== confirm) {
+          showPsToast('New passwords do not match', 'error'); return;
+        }
+        if (newPw.length < 6) {
+          showPsToast('Password must be at least 6 characters', 'error'); return;
+        }
+        btn.disabled = true;
+        btn.innerHTML = '<span class="ps-spinner"></span> Updating…';
+        const res = await apiCall('api/profile/password', 'PUT', { current_password: current, new_password: newPw });
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+        if (res.error) { showPsToast('Error: ' + res.error, 'error'); return; }
+        showPsToast('Password changed successfully', 'success');
+        document.getElementById('secCurrentPw').value = '';
+        document.getElementById('secNewPw').value     = '';
+        document.getElementById('secConfirmPw').value = '';
+        checkStrength('');
+      }
+    }
+
+    /* ═══════════════════════════════════════
+       AVATAR
+    ═══════════════════════════════════════ */
+    function handleAvatarChange(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.getElementById('psAvatarImg');
+        img.src = e.target.result;
+        img.style.display = 'block';
+        document.getElementById('psAvatarInitials').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+      showPsToast('Photo updated (save to apply)', 'success');
+    }
+
+    /* ═══════════════════════════════════════
+       PASSWORD STRENGTH
+    ═══════════════════════════════════════ */
+    function checkStrength(pw) {
+      const bars  = [1,2,3,4].map(i => document.getElementById('sb' + i));
+      const label = document.getElementById('strengthLabel');
+      bars.forEach(b => b.className = 'ps-strength-bar');
+      if (!pw) { label.textContent = 'Enter a password'; label.style.color = 'rgba(126,200,154,0.35)'; return; }
+      let score = 0;
+      if (pw.length >= 8)          score++;
+      if (/[A-Z]/.test(pw))        score++;
+      if (/[0-9]/.test(pw))        score++;
+      if (/[^a-zA-Z0-9]/.test(pw)) score++;
+      const levels = ['', 'weak', 'medium', 'strong', 'strong'];
+      const colors = { '': 'rgba(126,200,154,0.35)', weak: '#e74c3c', medium: '#c9a84c', strong: '#7ec89a' };
+      const labels = { '': '', weak: 'Weak', medium: 'Medium', strong: 'Strong' };
+      bars.forEach((b, i) => { if (i < score) b.classList.add(levels[score]); });
+      label.textContent  = labels[levels[score]] || '';
+      label.style.color  = colors[levels[score]];
+    }
+
+    /* ═══════════════════════════════════════
+       ACTIVITY FEED
+    ═══════════════════════════════════════ */
+    async function loadActivity() {
+      const feed = document.getElementById('psActivityFeed');
+      const data = await apiCall('api/history?page=1&limit=10', 'GET');
+      const predictions = data.predictions || [];
+
+      if (!predictions.length) {
+        feed.innerHTML = '<div style="text-align:center; padding:28px; color:rgba(126,200,154,0.35); font-size:0.83rem;">No activity yet. Upload a leaf to get started.</div>';
+        return;
+      }
+
+      const dotColors = { healthy: '#7ec89a', chhirke: '#f1948a', chirke: '#f1948a', leaf_blight: '#f0b27a' };
+      feed.innerHTML = predictions.map(p => {
+        const dot   = dotColors[p.disease] || '#7ec89a';
+        const time  = p.created_at ? new Date(p.created_at).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+        const label = (p.disease || '').replace(/_/g, ' ');
+        return `
+          <div class="ps-activity-item">
+            <div class="ps-activity-dot" style="background:${dot}"></div>
+            <div class="ps-activity-content">
+              <div class="ps-activity-text">Scanned leaf — <strong>${label}</strong> detected (${p.confidence}% confidence)</div>
+              <div class="ps-activity-time">${time}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    /* ═══════════════════════════════════════
+       DELETE ACCOUNT
+    ═══════════════════════════════════════ */
+    function confirmDeleteAccount() {
+      if (confirm('Are you sure? This will permanently delete your account and all data.')) {
+        showPsToast('Account deletion requested — contact support', 'error');
+      }
+    }
+
+    /* ═══════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════ */
+    let _psToastTimer;
+    function showPsToast(msg, type = 'success') {
+      const t = document.getElementById('ps-toast');
+      t.textContent = msg;
+      t.style.background  = type === 'error' ? 'rgba(50,12,12,0.97)' : 'rgba(22,45,30,0.97)';
+      t.style.borderColor = type === 'error' ? 'rgba(192,57,43,0.4)' : 'rgba(126,200,154,0.22)';
+      t.style.color       = type === 'error' ? '#f1948a' : '#7ec89a';
+      t.classList.add('show');
+      clearTimeout(_psToastTimer);
+      _psToastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    // Hide footer on info tab by default
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('psFooter').style.display = 'none';
+    });
+
+    /* ── EXPOSE for nav avatar hook ── */
+    window.openProfileSidebar  = openProfileSidebar;
+    window.closeProfileSidebar = closeProfileSidebar;
+  </script>
+</body>
+</html>

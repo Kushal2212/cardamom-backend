@@ -1,0 +1,2014 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Dashboard · Cardamom AI</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --g1: #1a3a2a;
+        --g2: #2d5c3f;
+        --g3: #4a9463;
+        --gp: #a8d5b0;
+        --cream: #f5f0e8;
+        --gold: #c8a84b;
+        --white: #fff;
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(168, 213, 176, 0.15);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--g1);
+        color: var(--cream);
+        min-height: 100vh;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 20% 10%,
+          rgba(74, 148, 99, 0.12) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        padding: 0 28px;
+        height: 62px;
+        background: rgba(26, 58, 42, 0.9);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(16px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        gap: 14px;
+      }
+      .nav-brand {
+        font-family: "Playfair Display", serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .admin-pill {
+        padding: 3px 11px;
+        background: rgba(200, 168, 75, 0.15);
+        border: 1px solid rgba(200, 168, 75, 0.3);
+        border-radius: 99px;
+        font-size: 0.72rem;
+        color: var(--gold);
+        font-weight: 500;
+      }
+      .nav-r {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .btn-nav {
+        padding: 7px 15px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--gp);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+      }
+      .btn-nav:hover {
+        color: var(--white);
+      }
+      .btn-danger {
+        background: rgba(192, 57, 43, 0.1);
+        border-color: rgba(192, 57, 43, 0.2);
+        color: #f1948a;
+      }
+      main {
+        padding: 26px 28px;
+        max-width: 1180px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+      .pg-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.75rem;
+        font-weight: 900;
+        color: var(--white);
+        margin-bottom: 3px;
+      }
+      .pg-sub {
+        color: var(--gp);
+        font-size: 0.87rem;
+        margin-bottom: 22px;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 13px;
+        margin-bottom: 22px;
+      }
+      .sc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px 20px;
+      }
+      .sc.hi {
+        background: rgba(74, 148, 99, 0.1);
+        border-color: rgba(168, 213, 176, 0.25);
+      }
+      .sc.gd {
+        background: rgba(200, 168, 75, 0.07);
+        border-color: rgba(200, 168, 75, 0.2);
+      }
+      .sc-icon {
+        font-size: 20px;
+        margin-bottom: 7px;
+        display: block;
+      }
+      .sc-num {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--white);
+        line-height: 1;
+      }
+      .sc-lbl {
+        font-size: 0.74rem;
+        color: var(--gp);
+        margin-top: 3px;
+      }
+      .sc-sub {
+        font-size: 0.7rem;
+        color: rgba(168, 213, 176, 0.5);
+        margin-top: 2px;
+      }
+      .chart-row {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 16px;
+        margin-bottom: 22px;
+      }
+      @media (max-width: 720px) {
+        .chart-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .chart-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+      }
+      .chart-card h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 16px;
+      }
+      .tcard {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 18px;
+      }
+      .thead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .thead h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--white);
+      }
+      .search {
+        padding: 7px 13px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--cream);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.82rem;
+        outline: none;
+        width: 200px;
+        transition: border 0.2s;
+        color-scheme: dark;
+      }
+      .search::placeholder {
+        color: rgba(168, 213, 176, 0.4);
+      }
+      .search:focus {
+        border-color: rgba(168, 213, 176, 0.4);
+      }
+      .search option {
+        background: var(--g1);
+        color: var(--cream);
+      }
+      select.search {
+        cursor: pointer;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        padding: 10px 16px;
+        text-align: left;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(168, 213, 176, 0.55);
+        font-weight: 500;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 11px 16px;
+        font-size: 0.84rem;
+        color: var(--cream);
+        border-bottom: 1px solid rgba(168, 213, 176, 0.05);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(74, 148, 99, 0.06);
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 99px;
+        font-size: 0.69rem;
+        font-weight: 500;
+      }
+      .b-green {
+        background: rgba(74, 148, 99, 0.25);
+        color: #a8d5b0;
+      }
+      .b-red {
+        background: rgba(192, 57, 43, 0.2);
+        color: #f1948a;
+      }
+      .b-gold {
+        background: rgba(200, 168, 75, 0.2);
+        color: var(--gold);
+      }
+      .b-blue {
+        background: rgba(74, 148, 99, 0.15);
+        color: var(--gp);
+      }
+      .del-btn {
+        background: none;
+        border: none;
+        color: rgba(241, 148, 138, 0.35);
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 3px 7px;
+        border-radius: 5px;
+        transition: color 0.2s;
+      }
+      .del-btn:hover {
+        color: #f1948a;
+      }
+      .pag {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 11px 16px;
+        border-top: 1px solid var(--border);
+      }
+      .pbtn {
+        padding: 5px 13px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        color: var(--gp);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.79rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .pbtn:hover:not(:disabled) {
+        border-color: rgba(168, 213, 176, 0.35);
+        color: var(--white);
+      }
+      .pbtn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      .pinfo {
+        font-size: 0.79rem;
+        color: var(--gp);
+      }
+      .empty {
+        text-align: center;
+        padding: 32px;
+        color: var(--gp);
+        font-size: 0.88rem;
+      }
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-backdrop.open {
+        display: flex;
+      }
+      .modal-box {
+        background: var(--g1);
+        border: 1px solid rgba(168, 213, 176, 0.22);
+        border-radius: 22px;
+        width: 100%;
+        max-width: 400px;
+        padding: 32px 28px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+        animation: modalIn 0.25s ease;
+      }
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .modal-icon {
+        font-size: 2.8rem;
+        display: block;
+        margin-bottom: 14px;
+      }
+      .modal-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.3rem;
+        color: var(--white);
+        margin-bottom: 8px;
+      }
+      .modal-msg {
+        color: var(--gp);
+        font-size: 0.88rem;
+        line-height: 1.65;
+        margin-bottom: 24px;
+      }
+      .modal-msg strong {
+        color: var(--cream);
+      }
+      .modal-btns {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .mbtn {
+        padding: 10px 26px;
+        border-radius: 10px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.25s;
+      }
+      .mbtn-cancel {
+        background: rgba(255, 255, 255, 0.07);
+        color: var(--gp);
+        border: 1px solid rgba(168, 213, 176, 0.2);
+      }
+      .mbtn-cancel:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--white);
+      }
+      .mbtn-confirm {
+        background: linear-gradient(135deg, #c0392b, #922b21);
+        color: var(--white);
+      }
+      .mbtn-confirm:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(192, 57, 43, 0.4);
+      }
+      .mbtn-primary {
+        background: linear-gradient(135deg, var(--g3), var(--g2));
+        color: var(--white);
+      }
+      .mbtn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(74, 148, 99, 0.4);
+      }
+      #toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(60px);
+        border-radius: 99px;
+        padding: 10px 22px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        z-index: 9999;
+        transition:
+          transform 0.35s ease,
+          opacity 0.35s ease;
+        opacity: 0;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      #toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #toast.success {
+        background: rgba(26, 58, 42, 0.97);
+        border: 1px solid rgba(168, 213, 176, 0.35);
+        color: #a8d5b0;
+      }
+      #toast.error {
+        background: rgba(60, 18, 18, 0.97);
+        border: 1px solid rgba(192, 57, 43, 0.4);
+        color: #f1948a;
+      }
+      #access-denied {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(10, 26, 18, 0.97);
+        backdrop-filter: blur(14px);
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 24px;
+        text-align: center;
+      }
+      #access-denied.show {
+        display: flex;
+      }
+      #access-denied .ad-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+      }
+      #access-denied h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        color: var(--white);
+        margin-bottom: 10px;
+      }
+      #access-denied p {
+        color: var(--gp);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        max-width: 420px;
+        margin-bottom: 28px;
+      }
+      #access-denied .ad-btns {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      footer {
+        text-align: center;
+        padding: 18px;
+        color: rgba(168, 213, 176, 0.3);
+        font-size: 0.74rem;
+        border-top: 1px solid var(--border);
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ACCESS DENIED -->
+    <div id="access-denied">
+      <span class="ad-icon">🔒</span>
+      <h2>Access Denied</h2>
+      <p>
+        This page is restricted to administrators only.<br />You do not have
+        permission to view the admin dashboard.
+      </p>
+      <p style="color: rgba(200, 168, 75, 0.7); font-size: 0.83rem">
+        यो पृष्ठ केवल प्रशासकका लागि हो
+      </p>
+      <div class="ad-btns">
+        <a
+          href="app.html"
+          class="mbtn mbtn-primary"
+          style="text-decoration: none"
+          >← Back to App</a
+        >
+        <a
+          href="index.html"
+          class="mbtn mbtn-cancel"
+          style="text-decoration: none"
+          >Go to Home</a
+        >
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="modal-backdrop" id="del-modal">
+      <div class="modal-box">
+        <span class="modal-icon">🗑️</span>
+        <div class="modal-title" id="del-modal-title">Delete</div>
+        <div class="modal-msg" id="del-modal-msg">Are you sure?</div>
+        <div class="modal-btns">
+          <button class="mbtn mbtn-cancel" onclick="closeDelModal()">
+            Cancel
+          </button>
+          <button class="mbtn mbtn-confirm" id="del-modal-confirm">
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast"></div>
+
+    <!-- NAV -->
+    <nav>
+      <div class="nav-brand">🌿 अलैँची</div>
+      <span class="admin-pill">Admin Panel</span>
+      <div class="nav-r">
+        <a href="app.html" class="btn-nav">← App</a>
+        <button class="btn-nav btn-danger" onclick="doLogout()">Logout</button>
+      </div>
+    </nav>
+
+    <main>
+      <div class="pg-title">Admin Dashboard</div>
+      <div class="pg-sub">
+        System overview · User management · Prediction logs
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="sc hi">
+          <span class="sc-icon">👥</span>
+          <div class="sc-num" id="s-users">—</div>
+          <div class="sc-lbl">Total users</div>
+          <div class="sc-sub" id="s-users-w">— this week</div>
+        </div>
+        <div class="sc hi">
+          <span class="sc-icon">🔬</span>
+          <div class="sc-num" id="s-preds">—</div>
+          <div class="sc-lbl">Total predictions</div>
+          <div class="sc-sub" id="s-preds-w">— this week</div>
+        </div>
+        <div class="sc gd">
+          <span class="sc-icon">📊</span>
+          <div class="sc-num" id="s-conf">—</div>
+          <div class="sc-lbl">Avg confidence</div>
+          <div class="sc-sub">across all scans</div>
+        </div>
+        <div class="sc">
+          <span class="sc-icon">🦠</span>
+          <div class="sc-num" id="s-chirke">—</div>
+          <div class="sc-lbl">Chirke detected</div>
+        </div>
+        <div class="sc">
+          <span class="sc-icon">🍂</span>
+          <div class="sc-num" id="s-blight">—</div>
+          <div class="sc-lbl">Leaf blight</div>
+        </div>
+        <div class="sc">
+          <span class="sc-icon">✅</span>
+          <div class="sc-num" id="s-healthy">—</div>
+          <div class="sc-lbl">Healthy scans</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <h3>Predictions — last 7 days</h3>
+          <canvas id="daily-chart" height="110"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Disease breakdown</h3>
+          <canvas id="disease-chart" height="110"></canvas>
+        </div>
+      </div>
+
+      <!-- Users table -->
+      <div class="tcard">
+        <div class="thead">
+          <h3>Registered users</h3>
+          <input
+            class="search"
+            id="user-search"
+            placeholder="Search name or email…"
+            oninput="debounceSearch(this.value)"
+          />
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Predictions</th>
+              <th>Joined</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr>
+              <td colspan="7" class="empty">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pag">
+          <button class="pbtn" id="u-prev" onclick="changeUserPage(-1)">
+            ← Prev
+          </button>
+          <span class="pinfo" id="u-info"></span>
+          <button class="pbtn" id="u-next" onclick="changeUserPage(1)">
+            Next →
+          </button>
+        </div>
+      </div>
+
+      <!-- Predictions table -->
+      <div class="tcard">
+        <div class="thead">
+          <h3>Recent predictions</h3>
+          <select class="search" id="pred-filter" onchange="loadPredictions(1)">
+            <option value="">All diseases</option>
+            <option value="chirke">Chirke</option>
+            <option value="healthy">Healthy</option>
+            <option value="leaf_blight">Leaf Blight</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Disease</th>
+              <th>Confidence</th>
+              <th>Severity</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="preds-tbody">
+            <tr>
+              <td colspan="6" class="empty">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pag">
+          <button class="pbtn" id="p-prev" onclick="changePredPage(-1)">
+            ← Prev
+          </button>
+          <span class="pinfo" id="p-info"></span>
+          <button class="pbtn" id="p-next" onclick="changePredPage(1)">
+            Next →
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages table -->
+      <div class="tcard">
+        <div class="thead">
+          <h3>
+            Contact Messages
+            <span
+              id="unread-badge"
+              style="
+                background: rgba(192, 57, 43, 0.2);
+                color: #f1948a;
+                padding: 2px 10px;
+                border-radius: 99px;
+                font-size: 0.75rem;
+                margin-left: 8px;
+              "
+            ></span>
+          </h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Subject</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="msgs-tbody">
+            <tr>
+              <td colspan="5" class="empty">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Newsletter Subscribers -->
+      <div class="tcard">
+        <div class="thead">
+          <h3>
+            📬 Newsletter Subscribers
+            <span
+              id="sub-count-badge"
+              style="
+                background: rgba(74, 148, 99, 0.2);
+                color: #a8d5b0;
+                padding: 2px 10px;
+                border-radius: 99px;
+                font-size: 0.75rem;
+                margin-left: 8px;
+              "
+            ></span>
+          </h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <select
+              class="search"
+              id="sub-filter"
+              onchange="loadSubscribers(1)"
+              style="width: 130px"
+            >
+              <option value="">All</option>
+              <option value="true">Active</option>
+              <option value="false">Unsubscribed</option>
+            </select>
+            <button
+              onclick="openSendModal()"
+              style="
+                padding: 7px 16px;
+                background: linear-gradient(135deg, #4a9463, #2d5c3f);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+                font-size: 0.82rem;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              ✉️ Send Newsletter
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Subscribed</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="subs-tbody">
+            <tr>
+              <td colspan="5" class="empty">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pag">
+          <button class="pbtn" id="s-prev" onclick="changeSubPage(-1)">
+            ← Prev
+          </button>
+          <span class="pinfo" id="s-info"></span>
+          <button class="pbtn" id="s-next" onclick="changeSubPage(1)">
+            Next →
+          </button>
+        </div>
+      </div>
+
+      <!-- SMS Alert System -->
+      <div class="tcard">
+        <div class="thead">
+          <h3>
+            📱 SMS Alert Farmers
+            <span
+              id="sms-count-badge"
+              style="
+                background: rgba(74, 148, 99, 0.2);
+                color: #a8d5b0;
+                padding: 2px 10px;
+                border-radius: 99px;
+                font-size: 0.75rem;
+                margin-left: 8px;
+              "
+            ></span>
+          </h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <select
+              class="search"
+              id="sms-district-filter"
+              onchange="loadFarmers(1)"
+              style="width: 140px"
+            >
+              <option value="">All Districts</option>
+              <option value="ilam">Ilam</option>
+              <option value="taplejung">Taplejung</option>
+              <option value="panchthar">Panchthar</option>
+              <option value="sankhuwasabha">Sankhuwasabha</option>
+            </select>
+            <button
+              onclick="openSendNowModal()"
+              style="
+                padding: 7px 14px;
+                background: linear-gradient(135deg, #4a9463, #2d5c3f);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+                font-size: 0.82rem;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              📡 Send Weekly Alert Now
+            </button>
+            <button
+              onclick="openCustomSMSModal()"
+              style="
+                padding: 7px 14px;
+                background: rgba(200, 168, 75, 0.12);
+                border: 1px solid rgba(200, 168, 75, 0.25);
+                color: #c8a84b;
+                border-radius: 8px;
+                font-family: &quot;DM Sans&quot;, sans-serif;
+                font-size: 0.82rem;
+                cursor: pointer;
+              "
+            >
+              ✏️ Custom SMS
+            </button>
+          </div>
+        </div>
+        <div
+          id="sms-stats-bar"
+          style="
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid rgba(168, 213, 176, 0.08);
+          "
+        >
+          <div
+            style="
+              flex: 1;
+              padding: 14px 20px;
+              border-right: 1px solid rgba(168, 213, 176, 0.08);
+              text-align: center;
+            "
+          >
+            <div
+              style="
+                font-family: &quot;Playfair Display&quot;, serif;
+                font-size: 1.5rem;
+                color: #fff;
+              "
+              id="sms-stat-total"
+            >
+              —
+            </div>
+            <div style="font-size: 0.72rem; color: var(--gp); margin-top: 2px">
+              Total Farmers
+            </div>
+          </div>
+          <div
+            style="
+              flex: 1;
+              padding: 14px 20px;
+              border-right: 1px solid rgba(168, 213, 176, 0.08);
+              text-align: center;
+            "
+          >
+            <div
+              style="
+                font-family: &quot;Playfair Display&quot;, serif;
+                font-size: 1.5rem;
+                color: #a8d5b0;
+              "
+              id="sms-stat-active"
+            >
+              —
+            </div>
+            <div style="font-size: 0.72rem; color: var(--gp); margin-top: 2px">
+              Active Subscribers
+            </div>
+          </div>
+          <div
+            style="
+              flex: 1;
+              padding: 14px 20px;
+              border-right: 1px solid rgba(168, 213, 176, 0.08);
+              text-align: center;
+            "
+          >
+            <div
+              style="font-size: 0.8rem; color: #c8a84b"
+              id="sms-stat-provider"
+            >
+              —
+            </div>
+            <div style="font-size: 0.72rem; color: var(--gp); margin-top: 2px">
+              SMS Provider
+            </div>
+          </div>
+          <div style="flex: 1; padding: 14px 20px; text-align: center">
+            <div
+              style="font-size: 0.78rem; color: var(--gp)"
+              id="sms-stat-last"
+            >
+              —
+            </div>
+            <div style="font-size: 0.72rem; color: var(--gp); margin-top: 2px">
+              Last Sent
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>District</th>
+              <th>Lang</th>
+              <th>Last SMS</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="farmers-tbody">
+            <tr>
+              <td colspan="7" class="empty">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pag">
+          <button class="pbtn" id="f-prev" onclick="changeFarmerPage(-1)">
+            ← Prev
+          </button>
+          <span class="pinfo" id="f-info"></span>
+          <button class="pbtn" id="f-next" onclick="changeFarmerPage(1)">
+            Next →
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Send Weekly Alert Now Modal -->
+    <div class="modal-backdrop" id="send-now-modal">
+      <div class="modal-box" style="max-width: 460px; text-align: left">
+        <button
+          onclick="closeSendNowModal()"
+          style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(168, 213, 176, 0.15);
+            color: #a8d5b0;
+            font-size: 0.9rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          ✕
+        </button>
+        <span class="modal-icon" style="text-align: center; display: block"
+          >📡</span
+        >
+        <div class="modal-title" style="text-align: center; margin-bottom: 8px">
+          Send Weekly Alert Now
+        </div>
+        <p
+          style="
+            text-align: center;
+            font-size: 0.83rem;
+            color: var(--gp);
+            margin-bottom: 20px;
+          "
+        >
+          Triggers the full weekly weather + disease risk SMS to all active
+          farmers immediately.
+        </p>
+        <div
+          id="send-now-info"
+          style="
+            padding: 10px 14px;
+            background: rgba(74, 148, 99, 0.1);
+            border: 1px solid rgba(168, 213, 176, 0.2);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #a8d5b0;
+            margin-bottom: 16px;
+          "
+        >
+          Loading…
+        </div>
+        <div style="margin-bottom: 16px">
+          <label
+            for="send-now-district"
+            style="
+              display: block;
+              font-size: 0.74rem;
+              color: #a8d5b0;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 6px;
+            "
+            >Filter by District (optional)</label
+          >
+          <select
+            id="send-now-district"
+            style="
+              width: 100%;
+              padding: 10px 14px;
+              background: rgba(255, 255, 255, 0.07);
+              border: 1px solid rgba(168, 213, 176, 0.2);
+              border-radius: 9px;
+              color: #f5f0e8;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 0.88rem;
+              outline: none;
+              color-scheme: dark;
+            "
+          >
+            <option value="">All Districts</option>
+            <option value="ilam">Ilam</option>
+            <option value="taplejung">Taplejung</option>
+            <option value="panchthar">Panchthar</option>
+            <option value="sankhuwasabha">Sankhuwasabha</option>
+          </select>
+        </div>
+        <div class="modal-btns" style="justify-content: flex-end">
+          <button class="mbtn mbtn-cancel" onclick="closeSendNowModal()">
+            Cancel
+          </button>
+          <button
+            class="mbtn mbtn-primary"
+            id="send-now-btn"
+            onclick="doSendNow()"
+          >
+            📡 Send Alerts Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom SMS Modal -->
+    <div class="modal-backdrop" id="custom-sms-modal">
+      <div class="modal-box" style="max-width: 480px; text-align: left">
+        <button
+          onclick="closeCustomSMSModal()"
+          style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(168, 213, 176, 0.15);
+            color: #a8d5b0;
+            font-size: 0.9rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          ✕
+        </button>
+        <span class="modal-icon" style="text-align: center; display: block"
+          >✏️</span
+        >
+        <div
+          class="modal-title"
+          style="text-align: center; margin-bottom: 20px"
+        >
+          Send Custom SMS
+        </div>
+        <div
+          id="custom-sms-info"
+          style="
+            padding: 10px 14px;
+            background: rgba(74, 148, 99, 0.1);
+            border: 1px solid rgba(168, 213, 176, 0.2);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #a8d5b0;
+            margin-bottom: 16px;
+          "
+        >
+          Loading…
+        </div>
+        <div style="margin-bottom: 20px">
+          <label
+            style="
+              display: block;
+              font-size: 0.74rem;
+              color: #a8d5b0;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 6px;
+            "
+            >Message *
+            <span
+              id="sms-char-count"
+              style="
+                color: rgba(168, 213, 176, 0.5);
+                text-transform: none;
+                letter-spacing: 0;
+              "
+              >0/160</span
+            ></label
+          >
+          <textarea
+            id="custom-sms-msg"
+            rows="5"
+            maxlength="160"
+            oninput="
+              document.getElementById('sms-char-count').textContent =
+                this.value.length + '/160'
+            "
+            placeholder="Write your SMS message here… (max 160 characters)"
+            style="
+              width: 100%;
+              padding: 11px 14px;
+              background: rgba(255, 255, 255, 0.07);
+              border: 1px solid rgba(168, 213, 176, 0.2);
+              border-radius: 9px;
+              color: #f5f0e8;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 0.88rem;
+              outline: none;
+              resize: vertical;
+              line-height: 1.6;
+            "
+          ></textarea>
+          <p
+            style="
+              font-size: 0.72rem;
+              color: rgba(168, 213, 176, 0.4);
+              margin-top: 4px;
+            "
+          >
+            Standard SMS is 160 characters. Exceeding this splits into 2
+            messages (costs 2x).
+          </p>
+        </div>
+        <div class="modal-btns" style="justify-content: flex-end">
+          <button class="mbtn mbtn-cancel" onclick="closeCustomSMSModal()">
+            Cancel
+          </button>
+          <button
+            class="mbtn mbtn-primary"
+            id="custom-sms-btn"
+            onclick="doSendCustomSMS()"
+          >
+            📱 Send to All Farmers
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send Newsletter Modal -->
+    <div class="modal-backdrop" id="send-modal">
+      <div class="modal-box" style="max-width: 520px; text-align: left">
+        <button
+          onclick="closeSendModal()"
+          style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(168, 213, 176, 0.15);
+            color: #a8d5b0;
+            font-size: 0.9rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          ✕
+        </button>
+        <span class="modal-icon" style="text-align: center; display: block"
+          >✉️</span
+        >
+        <div
+          class="modal-title"
+          style="text-align: center; margin-bottom: 20px"
+        >
+          Send Newsletter
+        </div>
+        <div
+          id="send-recipient-info"
+          style="
+            padding: 10px 14px;
+            background: rgba(74, 148, 99, 0.1);
+            border: 1px solid rgba(168, 213, 176, 0.2);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #a8d5b0;
+            margin-bottom: 18px;
+          "
+        >
+          Loading subscriber count…
+        </div>
+        <div style="margin-bottom: 14px">
+          <label
+            for="nl-subject"
+            style="
+              display: block;
+              font-size: 0.74rem;
+              color: #a8d5b0;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 6px;
+            "
+            >Email Subject *</label
+          >
+          <input
+            id="nl-subject"
+            type="text"
+            placeholder="e.g. New Article: Leaf Blight Control Tips"
+            style="
+              width: 100%;
+              padding: 11px 14px;
+              background: rgba(255, 255, 255, 0.07);
+              border: 1px solid rgba(168, 213, 176, 0.2);
+              border-radius: 9px;
+              color: #f5f0e8;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 0.9rem;
+              outline: none;
+            "
+          />
+        </div>
+        <div style="margin-bottom: 14px">
+          <label
+            for="nl-title"
+            style="
+              display: block;
+              font-size: 0.74rem;
+              color: #a8d5b0;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 6px;
+            "
+            >Article Title *</label
+          >
+          <input
+            id="nl-title"
+            type="text"
+            placeholder="e.g. How to Control Leaf Blight This Monsoon"
+            style="
+              width: 100%;
+              padding: 11px 14px;
+              background: rgba(255, 255, 255, 0.07);
+              border: 1px solid rgba(168, 213, 176, 0.2);
+              border-radius: 9px;
+              color: #f5f0e8;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 0.9rem;
+              outline: none;
+            "
+          />
+        </div>
+        <div style="margin-bottom: 20px">
+          <label
+            for="nl-body"
+            style="
+              display: block;
+              font-size: 0.74rem;
+              color: #a8d5b0;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin-bottom: 6px;
+            "
+            >Message Body *</label
+          >
+          <textarea
+            id="nl-body"
+            rows="6"
+            placeholder="Write your newsletter content here…"
+            style="
+              width: 100%;
+              padding: 11px 14px;
+              background: rgba(255, 255, 255, 0.07);
+              border: 1px solid rgba(168, 213, 176, 0.2);
+              border-radius: 9px;
+              color: #f5f0e8;
+              font-family: &quot;DM Sans&quot;, sans-serif;
+              font-size: 0.88rem;
+              outline: none;
+              resize: vertical;
+              line-height: 1.6;
+            "
+          ></textarea>
+          <p
+            style="
+              font-size: 0.72rem;
+              color: rgba(168, 213, 176, 0.4);
+              margin-top: 5px;
+            "
+          >
+            Each subscriber receives a branded email with an unsubscribe link.
+          </p>
+        </div>
+        <div class="modal-btns" style="justify-content: flex-end">
+          <button class="mbtn mbtn-cancel" onclick="closeSendModal()">
+            Cancel
+          </button>
+          <button
+            class="mbtn mbtn-primary"
+            id="nl-send-btn"
+            onclick="sendNewsletter()"
+          >
+            ✉️ Send to All
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer>© 2025 Cardamom Disease Detection · Admin Panel · Nepal 🇳🇵</footer>
+
+    <script src="/static/config.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+      /* ══ TOAST ══ */
+      function showToast(msg, type = "success", duration = 3200) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = "show " + type;
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => {
+          t.className = "";
+        }, duration);
+      }
+
+      /* ══ DELETE MODAL ══ */
+      function showDelModal({ title, msg, onConfirm }) {
+        document.getElementById("del-modal-title").textContent = title;
+        document.getElementById("del-modal-msg").innerHTML = msg;
+        const btn = document.getElementById("del-modal-confirm");
+        const fresh = btn.cloneNode(true);
+        btn.parentNode.replaceChild(fresh, btn);
+        fresh.addEventListener("click", async () => {
+          closeDelModal();
+          await onConfirm();
+        });
+        document.getElementById("del-modal").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeDelModal() {
+        document.getElementById("del-modal").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document
+        .getElementById("del-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeDelModal();
+        });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDelModal();
+      });
+
+      /* ══ ACCESS DENIED ══ */
+      function showAccessDenied() {
+        document.getElementById("access-denied").classList.add("show");
+        document.body.style.overflow = "hidden";
+      }
+
+      /* ══ AUTH CHECK ══ */
+      if (!isLoggedIn()) {
+        window.location.href = "login.html";
+      }
+
+      /* ══ STATE ══ */
+      let uPage = 1,
+        uTotal = 1,
+        pPage = 1,
+        pTotal = 1,
+        searchTimer = null;
+      let dailyChart = null,
+        diseaseChart = null;
+      const ICONS = {
+        healthy: "✅",
+        chirke: "🦠",
+        chhirke: "🦠",
+        leaf_blight: "🍂",
+      };
+      const SEV_C = { None: "b-green", Medium: "b-gold", High: "b-red" };
+
+      /* ══ DELEGATED CLICK HANDLER — replaces all inline onclick on .del-btn and .mark-read-btn ══ */
+      document.addEventListener("click", function (e) {
+        // Delete buttons
+        const delBtn = e.target.closest(".del-btn");
+        if (delBtn) {
+          const tbody = delBtn.closest("tbody");
+          if (!tbody) return;
+          if (tbody.id === "users-tbody")
+            deleteUser(delBtn.dataset.id, delBtn.dataset.name);
+          if (tbody.id === "subs-tbody")
+            deleteSubscriber(delBtn.dataset.id, delBtn.dataset.email);
+          if (tbody.id === "farmers-tbody")
+            deleteFarmer(delBtn.dataset.id, delBtn.dataset.name);
+          return;
+        }
+        // Mark-read buttons
+        const mrBtn = e.target.closest(".mark-read-btn");
+        if (mrBtn) {
+          markRead(mrBtn.dataset.id);
+        }
+      });
+
+      /* ══ STATS ══ */
+      async function loadStats() {
+        const d = await apiCall("api/admin/stats", "GET");
+        if (!d || d.error) {
+          showAccessDenied();
+          return;
+        }
+        document.getElementById("s-users").textContent = d.total_users;
+        document.getElementById("s-preds").textContent = d.total_predictions;
+        document.getElementById("s-conf").textContent = d.avg_confidence + "%";
+        document.getElementById("s-users-w").textContent =
+          "+" + d.new_users_week + " this week";
+        document.getElementById("s-preds-w").textContent =
+          "+" + d.new_preds_week + " this week";
+        document.getElementById("s-chirke").textContent =
+          d.disease_counts["chirke"] || d.disease_counts["chhirke"] || 0;
+        document.getElementById("s-blight").textContent =
+          d.disease_counts["leaf_blight"] || 0;
+        document.getElementById("s-healthy").textContent =
+          d.disease_counts["healthy"] || 0;
+        renderDailyChart(d.daily_predictions);
+        renderDiseaseChart(d.disease_counts);
+      }
+
+      function renderDailyChart(daily) {
+        const ctx = document.getElementById("daily-chart").getContext("2d");
+        if (dailyChart) dailyChart.destroy();
+        dailyChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: daily.map((d) => d.date),
+            datasets: [
+              {
+                label: "Predictions",
+                data: daily.map((d) => d.count),
+                backgroundColor: "rgba(74,148,99,.3)",
+                borderColor: "rgba(168,213,176,.6)",
+                borderWidth: 1,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: {
+                ticks: { color: "rgba(168,213,176,.55)", font: { size: 11 } },
+                grid: { color: "rgba(255,255,255,.04)" },
+              },
+              y: {
+                ticks: { color: "rgba(168,213,176,.55)", font: { size: 11 } },
+                grid: { color: "rgba(255,255,255,.05)" },
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      }
+
+      function renderDiseaseChart(counts) {
+        const ctx = document.getElementById("disease-chart").getContext("2d");
+        if (diseaseChart) diseaseChart.destroy();
+        diseaseChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(counts),
+            datasets: [
+              {
+                data: Object.values(counts),
+                backgroundColor: [
+                  "rgba(241,148,138,.75)",
+                  "rgba(168,213,176,.75)",
+                  "rgba(240,178,122,.75)",
+                ],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "rgba(168,213,176,.7)",
+                  font: { size: 11 },
+                  padding: 10,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      /* ══ USERS ══ */
+      async function loadUsers(page = 1, search = "") {
+        uPage = page;
+        let url = `api/admin/users?page=${page}&limit=8`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        const d = await apiCall(url, "GET");
+        if (!d || d.error) return;
+        uTotal = d.pages;
+        const tbody = document.getElementById("users-tbody");
+        if (!d.users.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="empty">No users found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = d.users
+          .map(
+            (u) => `
+          <tr>
+            <td style="color:rgba(168,213,176,.45)">#${u._id}</td>
+            <td>${escHtml(u.name)}</td>
+            <td style="color:var(--gp)">${escHtml(u.email)}</td>
+            <td><span class="badge ${u.is_admin ? "b-gold" : "b-blue"}">${u.is_admin ? "Admin" : "User"}</span></td>
+            <td>${u.prediction_count ?? u.predictions ?? 0}</td>
+            <td style="color:var(--gp)">${new Date(u.created_at).toLocaleDateString()}</td>
+            <td>${!u.is_admin ? `<button class="del-btn" data-id="${u._id}" data-name="${escAttr(u.name)}">🗑 Delete</button>` : "—"}</td>
+          </tr>`,
+          )
+          .join("");
+        document.getElementById("u-info").textContent =
+          `Page ${page} of ${d.pages}`;
+        document.getElementById("u-prev").disabled = page <= 1;
+        document.getElementById("u-next").disabled = page >= d.pages;
+      }
+
+      function debounceSearch(val) {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => loadUsers(1, val), 400);
+      }
+      function changeUserPage(d) {
+        loadUsers(
+          Math.max(1, Math.min(uTotal, uPage + d)),
+          document.getElementById("user-search").value,
+        );
+      }
+
+      function deleteUser(_id, name) {
+        showDelModal({
+          title: "Delete User",
+          msg: `Are you sure you want to delete <strong>${escHtml(name)}</strong>?<br><span style="font-size:.8rem;color:rgba(241,148,138,.7)">This will also delete all their predictions and uploaded images.</span>`,
+          onConfirm: async () => {
+            const r = await apiCall("api/admin/users/" + _id, "DELETE");
+            if (!r || r.error) {
+              showToast("❌ " + (r?.error || "Delete failed"), "error");
+              return;
+            }
+            showToast(
+              "✅ " + (r.message || "User deleted successfully"),
+              "success",
+            );
+            loadUsers(uPage);
+            loadStats();
+          },
+        });
+      }
+
+      /* ══ PREDICTIONS ══ */
+      async function loadPredictions(page = 1) {
+        pPage = page;
+        const disease = document.getElementById("pred-filter").value;
+        let url = `api/admin/predictions?page=${page}&limit=10`;
+        if (disease) url += `&disease=${disease}`;
+        const d = await apiCall(url, "GET");
+        if (!d || d.error) return;
+        pTotal = d.pages;
+        const tbody = document.getElementById("preds-tbody");
+        if (!d.predictions.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="empty">No predictions found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = d.predictions
+          .map(
+            (p, i) => `
+          <tr>
+            <td style="color:rgba(168,213,176,.45)">#${(page - 1) * 10 + i + 1}</td>
+            <td>${escHtml(p.user_name)}</td>
+            <td>${ICONS[p.disease] || "🌿"} ${p.disease.replace(/_/g, " ")}</td>
+            <td><span class="badge b-blue">${p.confidence}%</span></td>
+            <td><span class="badge ${SEV_C[p.severity] || "b-blue"}">${p.severity}</span></td>
+            <td style="color:var(--gp)">${new Date(p.created_at).toLocaleDateString()}</td>
+          </tr>`,
+          )
+          .join("");
+        document.getElementById("p-info").textContent =
+          `Page ${page} of ${d.pages}`;
+        document.getElementById("p-prev").disabled = page <= 1;
+        document.getElementById("p-next").disabled = page >= d.pages;
+      }
+      function changePredPage(d) {
+        loadPredictions(Math.max(1, Math.min(pTotal, pPage + d)));
+      }
+
+      /* ══ MESSAGES ══ */
+      async function loadMessages() {
+        const d = await apiCall("api/admin/messages", "GET");
+        if (!d || d.error) return;
+        if (d.unread > 0)
+          document.getElementById("unread-badge").textContent =
+            d.unread + " unread";
+        const tbody = document.getElementById("msgs-tbody");
+        if (!d.messages.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="empty">No messages yet</td></tr>';
+          return;
+        }
+        tbody.innerHTML = d.messages
+          .map(
+            (m) => `
+          <tr style="${!m.is_read ? "background:rgba(74,148,99,.05)" : ""}">
+            <td>${escHtml(m.name)}</td>
+            <td style="color:var(--gp)">${escHtml(m.email)}</td>
+            <td>${escHtml(m.subject)}</td>
+            <td style="color:var(--gp)">${new Date(m.created_at).toLocaleDateString()}</td>
+            <td>${
+              !m.is_read
+                ? `<button class="mark-read-btn" data-id="${m._id}" style="background:none;border:1px solid rgba(168,213,176,.3);border-radius:6px;color:var(--gp);font-size:.78rem;padding:3px 10px;cursor:pointer">Mark read</button>`
+                : '<span style="color:rgba(168,213,176,.4);font-size:.78rem">Read</span>'
+            }</td>
+          </tr>
+          <tr><td colspan="5" style="padding:8px 16px;color:var(--gp);font-size:.82rem;border-bottom:1px solid rgba(168,213,176,.08)">${escHtml(m.message)}</td></tr>`,
+          )
+          .join("");
+      }
+
+      async function markRead(_id) {
+        await apiCall("api/admin/messages/" + _id + "/read", "POST");
+        loadMessages();
+      }
+
+      /* ══ LOGOUT ══ */
+      function doLogout() {
+        clearAuth();
+        window.location.href = "/";
+      }
+
+      /* ══ SUBSCRIBERS ══ */
+      let sPage = 1,
+        sTotal = 1;
+
+      async function loadSubscribers(page = 1) {
+        sPage = page;
+        const active = document.getElementById("sub-filter").value;
+        let url = `api/newsletter/subscribers?page=${page}&limit=10`;
+        if (active) url += `&active=${active}`;
+        const d = await apiCall(url, "GET");
+        if (!d || d.error) return;
+        sTotal = d.pages;
+        document.getElementById("sub-count-badge").textContent =
+          d.total_active + " active";
+        const tbody = document.getElementById("subs-tbody");
+        if (!Array.isArray(d.subscribers) || !d.subscribers.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="empty">No subscribers yet</td></tr>';
+          document.getElementById("s-info").textContent = "";
+          return;
+        }
+        tbody.innerHTML = d.subscribers
+          .map(
+            (s) => `
+          <tr>
+            <td style="color:rgba(168,213,176,.45)">#${s._id}</td>
+            <td style="color:var(--gp)">${escHtml(s.email)}</td>
+            <td><span class="badge ${s.is_active ? "b-green" : "b-red"}">${s.is_active ? "Active" : "Unsubscribed"}</span></td>
+            <td style="color:var(--gp)">${new Date(s.created_at).toLocaleDateString()}</td>
+            <td><button class="del-btn" data-id="${s.email}" data-email="${escAttr(s.email)}">🗑 Remove</button></td>
+          </tr>`,
+          )
+          .join("");
+        document.getElementById("s-info").textContent =
+          `Page ${page} of ${d.pages}`;
+        document.getElementById("s-prev").disabled = page <= 1;
+        document.getElementById("s-next").disabled = page >= d.pages;
+      }
+      function changeSubPage(d) {
+        loadSubscribers(Math.max(1, Math.min(sTotal, sPage + d)));
+      }
+
+      function deleteSubscriber(_id, email) {
+        showDelModal({
+          title: "Remove Subscriber",
+          msg: `Remove <strong>${escHtml(email)}</strong> from the newsletter list?`,
+          onConfirm: async () => {
+            const r = await apiCall(
+              "api/newsletter/subscribers/" + _id,
+              "DELETE",
+            );
+            if (!r || r.error) {
+              showToast("❌ " + (r?.error || "Failed"), "error");
+              return;
+            }
+            showToast("✅ Subscriber removed", "success");
+            loadSubscribers(sPage);
+          },
+        });
+      }
+
+      /* ══ NEWSLETTER MODAL ══ */
+      async function openSendModal() {
+        const d = await apiCall(
+          "api/newsletter/subscribers?active=true&limit=1",
+          "GET",
+        );
+        const count = d?.total_active ?? "?";
+        document.getElementById("send-recipient-info").innerHTML =
+          `📬 This newsletter will be sent to <strong style="color:#fff">${count} active subscriber${count !== 1 ? "s" : ""}</strong>.`;
+        ["nl-subject", "nl-title", "nl-body"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("send-modal").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeSendModal() {
+        document.getElementById("send-modal").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document
+        .getElementById("send-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeSendModal();
+        });
+
+      async function sendNewsletter() {
+        const subject = document.getElementById("nl-subject").value.trim();
+        const title = document.getElementById("nl-title").value.trim();
+        const body = document.getElementById("nl-body").value.trim();
+        if (!subject || !title || !body) {
+          showToast("⚠️ Please fill in all fields", "error");
+          return;
+        }
+        const btn = document.getElementById("nl-send-btn");
+        btn.disabled = true;
+        btn.textContent = "⏳ Sending…";
+        const r = await apiCall("api/newsletter/send", "POST", {
+          subject,
+          title,
+          body,
+        });
+        btn.disabled = false;
+        btn.textContent = "✉️ Send to All";
+        if (!r || r.error) {
+          showToast("❌ " + (r?.error || "Send failed"), "error");
+          return;
+        }
+        closeSendModal();
+        showToast(
+          `✅ Sent to ${r.sent} subscriber${r.sent !== 1 ? "s" : ""}!`,
+          "success",
+          4000,
+        );
+      }
+
+      /* ══ SMS FARMERS ══ */
+      let fPage = 1,
+        fTotal = 1;
+
+      async function loadSMSStats() {
+        const d = await apiCall("api/sms/stats", "GET");
+        if (!d || d.error) return;
+        document.getElementById("sms-stat-total").textContent = d.total_farmers;
+        document.getElementById("sms-stat-active").textContent =
+          d.active_farmers;
+        document.getElementById("sms-stat-provider").textContent = (
+          d.provider || "textbelt"
+        ).toUpperCase();
+        document.getElementById("sms-count-badge").textContent =
+          d.active_farmers + " active";
+        document.getElementById("sms-stat-last").textContent = d.last_sent_at
+          ? new Date(d.last_sent_at).toLocaleDateString()
+          : "Never";
+      }
+
+      async function loadFarmers(page = 1) {
+        fPage = page;
+        const district = document.getElementById("sms-district-filter").value;
+        let url = `api/sms/farmers?page=${page}&limit=10`;
+        if (district) url += `&district=${district}`;
+        const d = await apiCall(url, "GET");
+        if (!d || d.error) return;
+        fTotal = d.pages;
+        const tbody = document.getElementById("farmers-tbody");
+        if (!d.farmers.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="empty">No farmers registered yet</td></tr>';
+          document.getElementById("f-info").textContent = "";
+          return;
+        }
+        tbody.innerHTML = d.farmers
+          .map(
+            (f) => `
+          <tr>
+            <td style="color:rgba(168,213,176,.45)">#${f.id}</td>
+            <td>${escHtml(f.name)}</td>
+            <td style="color:var(--gp)">${escHtml(f.phone)}</td>
+            <td><span class="badge b-blue">${f.district || "—"}</span></td>
+            <td><span class="badge ${f.language === "ne" ? "b-gold" : "b-blue"}">${f.language === "ne" ? "NE" : "EN"}</span></td>
+            <td style="color:var(--gp);font-size:.78rem">${f.last_sms_at ? new Date(f.last_sms_at).toLocaleDateString() : "Never"}</td>
+            <td><button class="del-btn" data-id="${f._id}" data-name="${escAttr(f.name)}">🗑 Remove</button></td>
+          </tr>`,
+          )
+          .join("");
+        document.getElementById("f-info").textContent =
+          `Page ${page} of ${d.pages}`;
+        document.getElementById("f-prev").disabled = page <= 1;
+        document.getElementById("f-next").disabled = page >= d.pages;
+      }
+      function changeFarmerPage(d) {
+        loadFarmers(Math.max(1, Math.min(fTotal, fPage + d)));
+      }
+
+      function deleteFarmer(_id, name) {
+        showDelModal({
+          title: "Remove Farmer",
+          msg: `Remove <strong>${escHtml(name)}</strong> from SMS alerts?`,
+          onConfirm: async () => {
+            const r = await apiCall("api/sms/farmers/" + _id, "DELETE");
+            if (!r || r.error) {
+              showToast("❌ " + (r?.error || "Failed"), "error");
+              return;
+            }
+            showToast("✅ Farmer removed", "success");
+            loadFarmers(fPage);
+            loadSMSStats();
+          },
+        });
+      }
+
+      /* ══ SEND NOW MODAL ══ */
+      async function openSendNowModal() {
+        const d = await apiCall("api/sms/stats", "GET");
+        const count = d?.active_farmers ?? "?";
+        document.getElementById("send-now-info").innerHTML =
+          `📡 This will send the weekly weather & disease risk SMS to <strong style="color:#fff">${count} active farmer${count !== 1 ? "s" : ""}</strong> immediately.`;
+        document.getElementById("send-now-district").value = "";
+        document.getElementById("send-now-modal").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeSendNowModal() {
+        document.getElementById("send-now-modal").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document
+        .getElementById("send-now-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeSendNowModal();
+        });
+
+      async function doSendNow() {
+        const district = document.getElementById("send-now-district").value;
+        const btn = document.getElementById("send-now-btn");
+        btn.disabled = true;
+        btn.textContent = "⏳ Sending…";
+        const r = await apiCall(
+          "api/sms/send-now",
+          "POST",
+          district ? { district } : {},
+        );
+        btn.disabled = false;
+        btn.textContent = "📡 Send Alerts Now";
+        if (!r || r.error) {
+          showToast("❌ " + (r?.error || "Send failed"), "error");
+          return;
+        }
+        closeSendNowModal();
+        showToast(
+          `✅ Sent to ${r.sent} farmer${r.sent !== 1 ? "s" : ""}!`,
+          "success",
+          4000,
+        );
+        loadFarmers(fPage);
+        loadSMSStats();
+      }
+
+      /* ══ CUSTOM SMS MODAL ══ */
+      async function openCustomSMSModal() {
+        const d = await apiCall("api/sms/stats", "GET");
+        const count = d?.active_farmers ?? "?";
+        document.getElementById("custom-sms-info").innerHTML =
+          `📱 This will send your custom message to <strong style="color:#fff">${count} active farmer${count !== 1 ? "s" : ""}</strong>.`;
+        document.getElementById("custom-sms-msg").value = "";
+        document.getElementById("sms-char-count").textContent = "0/160";
+        document.getElementById("custom-sms-modal").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeCustomSMSModal() {
+        document.getElementById("custom-sms-modal").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document
+        .getElementById("custom-sms-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeCustomSMSModal();
+        });
+
+      async function doSendCustomSMS() {
+        const message = document.getElementById("custom-sms-msg").value.trim();
+        if (!message) {
+          showToast("⚠️ Please write a message", "error");
+          return;
+        }
+        if (message.length > 160) {
+          showToast("⚠️ Message too long (max 160 chars)", "error");
+          return;
+        }
+        const btn = document.getElementById("custom-sms-btn");
+        btn.disabled = true;
+        btn.textContent = "⏳ Sending…";
+        const r = await apiCall("api/sms/send-custom", "POST", { message });
+        btn.disabled = false;
+        btn.textContent = "📱 Send to All Farmers";
+        if (!r || r.error) {
+          showToast("❌ " + (r?.error || "Send failed"), "error");
+          return;
+        }
+        closeCustomSMSModal();
+        showToast(
+          `✅ Sent to ${r.sent} farmer${r.sent !== 1 ? "s" : ""}!`,
+          "success",
+          4000,
+        );
+      }
+
+      /* ══ HELPERS ══ */
+      function escHtml(s) {
+        return String(s ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+      function escAttr(s) {
+        return String(s ?? "")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      /* ══ INIT ══ */
+      loadStats();
+      loadUsers();
+      loadPredictions();
+      loadMessages();
+      loadSubscribers();
+      loadFarmers();
+      loadSMSStats();
+    </script>
+  </body>
+</html>

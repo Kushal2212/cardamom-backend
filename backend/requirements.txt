@@ -1,0 +1,52 @@
+# ── Flask core ──────────────────────────────────────────────
+Flask==3.1.3
+Werkzeug==3.1.8
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+click==8.3.2
+blinker==1.9.0
+itsdangerous==2.2.0
+
+# ── Auth ────────────────────────────────────────────────────
+Flask-Bcrypt==1.0.1
+bcrypt==5.0.0
+Flask-JWT-Extended==4.7.1
+PyJWT==2.12.1
+
+# ── Database ─────────────────────────────────────────────────
+pymongo
+dnspython==2.8.0
+
+# ── CORS + Environment ───────────────────────────────────────
+flask-cors
+python-dotenv
+
+# ── Email ────────────────────────────────────────────────────
+Flask-Mail
+email-validator==2.3.0
+
+# ── Scheduler (SMS alerts) ───────────────────────────────────
+APScheduler==3.11.2
+tzlocal==5.3.1
+tzdata==2026.1
+
+# ── HTTP requests (calls Hugging Face API) ───────────────────
+requests==2.33.1
+urllib3==2.6.3
+
+# ── Image processing ─────────────────────────────────────────
+pillow==12.2.0
+opencv-python-headless==4.13.0.92
+
+# ── Utilities ────────────────────────────────────────────────
+password-strength==0.0.3.post2
+validators==0.35.0
+python-dateutil==2.9.0.post0
+
+# ── Server ───────────────────────────────────────────────────
+gunicorn==25.3.0
+
+# ── Networking/encoding ──────────────────────────────────────
+certifi==2026.2.25
+charset-normalizer==3.4.7
+idna==3.11

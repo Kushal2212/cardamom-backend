@@ -1,0 +1,46 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ML models (VERY IMPORTANT)
+*.h5
+*.keras
+*.pkl
+*.joblib
+*.ckpt
+*.tflite
+
+# Datasets (IMPORTANT for ML)
+*.csv
+*.zip
+*.tar
+*.gz
+datasets/
+data/
+
+# Git
+.git/
+.gitignore
+
+# Database
+database/
+
+# Uploads (runtime only)
+webapp/static/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Tests
+tests/
