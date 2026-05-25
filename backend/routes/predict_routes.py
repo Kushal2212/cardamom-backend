@@ -4,6 +4,7 @@ import requests
 import base64
 from datetime import datetime
 import json
+from bson import ObjectId
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -148,3 +149,65 @@ def predict():
         "gradcam_url":    None,
         "saved":          True
     }), 200
+    
+    
+    
+    
+
+@predict_bp.route("/history", methods=["GET"])
+@jwt_required()
+def history():
+    user_id = get_jwt_identity()
+    page  = int(request.args.get("page", 1))
+    limit = int(request.args.get("limit", 10))
+    skip  = (page - 1) * limit
+
+    cursor = predictions.find({"user_id": user_id}) \
+        .sort("created_at", -1).skip(skip).limit(limit)
+
+    data = []
+    for p in cursor:
+        p["_id"] = str(p["_id"])
+        data.append(p)
+
+    total = predictions.count_documents({"user_id": user_id})
+
+    return jsonify({
+        "predictions": data,
+        "total": total,
+        "page": page,
+        "pages": (total // limit) + 1
+    })
+
+
+@predict_bp.route("/stats", methods=["GET"])
+@jwt_required()
+def stats():
+    user_id = get_jwt_identity()
+    pipeline = [
+        {"$match": {"user_id": user_id}},
+        {"$group": {"_id": "$disease", "count": {"$sum": 1}}}
+    ]
+    result  = predictions.aggregate(pipeline)
+    counts  = {r["_id"]: r["count"] for r in result}
+    total   = predictions.count_documents({"user_id": user_id})
+    return jsonify({"total_predictions": total, "disease_counts": counts})
+
+
+@predict_bp.route("/history/<pid>", methods=["DELETE"])
+@jwt_required()
+def delete_prediction(pid):
+    user_id = get_jwt_identity()
+    try:
+        oid = ObjectId(pid)
+    except Exception:
+        oid = None
+    record = predictions.find_one({"_id": oid or pid, "user_id": user_id})
+    if not record:
+        return jsonify({"error": "Not found"}), 404
+    if record.get("image_filename"):
+        img_path = os.path.join(current_app.root_path, "static", "uploads", record["image_filename"])
+        if os.path.exists(img_path):
+            os.remove(img_path)
+    predictions.delete_one({"_id": oid or pid})
+    return jsonify({"message": "Deleted"})
