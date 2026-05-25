@@ -1,5 +1,5 @@
 # top of app.py
-from backend.database.mongo import users
+from database.mongo import users
 from backend.extensions import bcrypt, jwt
 from flask_cors import CORS
 from flask_jwt_extended import get_jwt_identity, jwt_required
